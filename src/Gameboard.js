@@ -69,36 +69,59 @@ function Gameboard() {
       const length = availableShips.splice(0, 1)
       const ship = Ship(length)
       ships.push(ship)
+      const shipPointer = ships.length - 1
 
-      // When Y is always the same but X isnt
+      // When Y is always the same but X isnt ROWS
       if (orientation === Orientation.HORIZONTAL) {
         if (coordinatesOrientation !== Orientation.HORIZONTAL)
           transponse(Orientation.HORIZONTAL)
         if (x === 0) {
           for (let i = 0; i < length; i++) {
-            coordinates[y][x + i].ship = ships.length - 1
+            coordinates[y][x + i].ship = shipPointer
           }
+          return
         }
-
         if (x === 9) {
           for (let i = 0; i < length; i++) {
-            coordinates[y][x - i].ship = ships.length - 1
+            coordinates[y][x - i].ship = shipPointer
+          }
+          return
+        }
+        // When the ship is not an edge take the middle of it and place it
+
+        let upper = Math.round(length / 2)
+        let bottom = length - upper
+        // Only if the ship is of even length if this isnt done we the board will incorrectly place the ship
+
+        if (length % 2 === 0) {
+          bottom--
+        }
+
+        while (upper >= 0 && bottom >= 0) {
+          if (upper >= 0) {
+            coordinates[y][x + upper].ship = shipPointer
+            upper--
+          }
+
+          if (bottom >= 0) {
+            coordinates[y][x - bottom].ship = shipPointer
+            bottom--
           }
         }
       }
-      // When X is always the same but Y isnt
+      // When X is always the same but Y isnt COLUMNS
       if (orientation === Orientation.VERTICAL) {
         if (coordinatesOrientation !== Orientation.VERTICAL)
           transponse(Orientation.VERTICAL)
         if (y === 0) {
           for (let i = 0; i < length; i++) {
-            coordinates[x][y + i].ship = ships.length - 1
+            coordinates[x][y + i].ship = shipPointer
           }
         }
 
         if (y === 9) {
           for (let i = 0; i < length; i++) {
-            coordinates[x][y - i].ship = ships.length - 1
+            coordinates[x][y - i].ship = shipPointer
           }
         }
       }
