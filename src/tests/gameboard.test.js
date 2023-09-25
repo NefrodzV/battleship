@@ -1,5 +1,20 @@
 const Gameboard = require("../Gameboard")
 
+test("Place a ship and checking its equal to the its length in the board", () => {
+  const gameboard = Gameboard()
+  gameboard.placeShip(2, 0, gameboard.Orientation.HORIZONTAL)
+  expect(gameboard.getCoordinates()[0][4]).toEqual({ x: 4, y: 0, ship: null })
+  expect(gameboard.getCoordinates()[0][3]).toEqual({ x: 3, y: 0, ship: 0 })
+  expect(gameboard.getCoordinates()[0][2]).toEqual({ x: 2, y: 0, ship: 0 })
+  expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 1, y: 0, ship: null })
+})
+test("Place a ship when its not in the edge of the board", () => {
+  const gameboard = Gameboard()
+  gameboard.placeShip(1, 0, gameboard.Orientation.HORIZONTAL)
+  expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 1, y: 0, ship: 0 })
+  expect(gameboard.getCoordinates()[0][2]).toEqual({ x: 2, y: 0, ship: 0 })
+})
+
 test("place ship at the end x is 9", () => {
   const gameboard = Gameboard()
   gameboard.placeShip(9, 0, gameboard.Orientation.HORIZONTAL)
