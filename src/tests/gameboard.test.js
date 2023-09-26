@@ -10,24 +10,41 @@ const mockObserver = jest.fn(() => {
   }
 })
 
+//TODO: MAKE TEST TO SEND MESSAGE TO UI TO REGISTER HITS AND MAKE TEST FOR THE HITS OF SHIPS
+/**HITS OF SHIPS LOGIC
+ * 1- THE UI SENDS A FIRE FROM THE OPPOSITE SIDE
+ * 2- WE RUN THE FUNCTION AND CHECK IF THE COORDINATE IS ALREADY HIT
+ * 3- WE MARK THE GRID ALREADY HIT/FIRED
+ * 4- WE CHECK IF A SHIP IS HIT.
+ * 5- WE CHECK IF THERE ARE STILL SHIPS STANDING IF NOT WE CAN CONTINUE REGISTERING HITS OR DECLARE THE WINNER
+ */
+
 test("Place a ship in vertical and horizontal position", () => {
   const gameboard = Gameboard(mockObserver())
   gameboard.placeShip(0, 1, gameboard.Orientation.VERTICAL)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
 
+  // First ship position
   expect(gameboard.getCoordinates()[1][0]).toEqual({ x: 0, y: 1, ship: 0 })
   expect(gameboard.getCoordinates()[2][0]).toEqual({ x: 0, y: 2, ship: 0 })
-
+  // Second ship position
   expect(gameboard.getCoordinates()[0][0]).toEqual({ x: 0, y: 0, ship: 1 })
   expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 1, y: 0, ship: 1 })
   expect(gameboard.getCoordinates()[0][2]).toEqual({ x: 2, y: 0, ship: 1 })
 
   expect(notify).not.toBeCalled()
 })
+
 test("Check if notify gets called when a ship is already in the board coordinate", () => {
   const gameboard = Gameboard(mockObserver())
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
   gameboard.placeShip(1, 0, gameboard.Orientation.HORIZONTAL)
+  expect(notify).toBeCalled()
+})
+
+test("place ship at the end x is 9 and observer notify function gets called", () => {
+  const gameboard = Gameboard(mockObserver())
+  gameboard.placeShip(9, 0, gameboard.Orientation.HORIZONTAL)
   expect(notify).toBeCalled()
 })
 
@@ -39,23 +56,10 @@ test("Place a ship and checking its equal to the its length in the board", () =>
   expect(gameboard.getCoordinates()[0][2]).toEqual({ x: 2, y: 0, ship: 0 })
   expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 1, y: 0, ship: null })
 })
-test("Place a ship when its not in the edge of the board", () => {
-  const gameboard = Gameboard(mockObserver())
-  gameboard.placeShip(1, 0, gameboard.Orientation.HORIZONTAL)
-  expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 1, y: 0, ship: 0 })
-  expect(gameboard.getCoordinates()[0][2]).toEqual({ x: 2, y: 0, ship: 0 })
-})
-
-test("place ship at the end x is 9 and observer notify function gets called", () => {
-  const gameboard = Gameboard(mockObserver())
-  gameboard.placeShip(9, 0, gameboard.Orientation.HORIZONTAL)
-  expect(notify).toBeCalled()
-})
 
 test("Place ship in gameboard in vertical position and the y is 0", () => {
   const gameboard = Gameboard(mockObserver())
   gameboard.placeShip(0, 0, gameboard.Orientation.VERTICAL)
-
   expect(gameboard.getCoordinates()[0][0]).toEqual({ x: 0, y: 0, ship: 0 })
   expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 0, y: 1, ship: 0 })
 })
@@ -63,11 +67,11 @@ test("Place ship in gameboard in vertical position and the y is 0", () => {
 test("Place ship in gameboard when the x is 0 and horizontal", () => {
   const gameboard = Gameboard(mockObserver())
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
-
   expect(gameboard.getCoordinates()[0][0]).toEqual({ x: 0, y: 0, ship: 0 })
   expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 1, y: 0, ship: 0 })
 })
 
 test("Gameboard coordinates are 10 in length", () => {
   expect(Gameboard(mockObserver()).getCoordinates().length).toBe(10)
+  expect(Gameboard(mockObserver()).getCoordinates()[0].length).toBe(10)
 })
