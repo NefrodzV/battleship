@@ -8,6 +8,7 @@
 const Ship = require("./Ship")
 function Gameboard(observer) {
   const INCORRECT_PLACEMENT_MESSAGE = "Not a valid placement coordinate"
+  const SHIP_ALREADY_IN_PLACE_MESSAGE = "Ship already in place"
   // Class that has the orientation parameters of  how the ships will be placed
   const Orientation = {
     VERTICAL: "Vertical", // Sets the board array to columns
@@ -41,7 +42,16 @@ function Gameboard(observer) {
             arrayTransposed[x].push(coordinates[y][x])
           }
         }
-        coordinatesOrientation = Orientation.VERTICAL
+        coordinatesOrientation = orientation
+        break
+      case Orientation.HORIZONTAL:
+        for (let y = 0; y < 10; y++) {
+          arrayTransposed.push([])
+          for (let x = 0; x < 10; x++) {
+            arrayTransposed[y].push(coordinates[x][y])
+          }
+        }
+        coordinatesOrientation = orientation
         break
 
       default:
@@ -58,21 +68,59 @@ function Gameboard(observer) {
     // }
   }
 
+  const areEqual = (shipOrientation, correctOrientation) => {
+    return shipOrientation === correctOrientation
+  }
+
+  const isShipInPlace = (x, y, shipOrientation) => {
+    const length = availableShips.at(0)
+    let spaceTaken = null
+
+    switch (shipOrientation) {
+      case Orientation.HORIZONTAL:
+        for (let i = 0; i < length; i++) {
+          const shipPointer = coordinates[y][x + i].ship
+          if (shipPointer !== null) {
+            spaceTaken = true
+            break
+          }
+        }
+        break
+
+      case Orientation.VERTICAL:
+        for (let i = 0; i < length; i++) {
+          const shipPointer = coordinates[x][y + i].ship
+          if (shipPointer !== null) {
+            spaceTaken = true
+            break
+          }
+        }
+        break
+
+      default:
+        console.log(
+          "UH OH something went wrong checking the space of ship in place"
+        )
+    }
+
+    return spaceTaken
+  }
   const isValidPlacement = (x, y, shipOrientation) => {
     const length = availableShips.at(0) // The first one
 
-    if (shipOrientation === Orientation.HORIZONTAL) {
+    if (areEqual(shipOrientation, Orientation.HORIZONTAL)) {
       const futurePosition = x + length
       if (futurePosition < 10) return true
       return false
     }
 
-    if (shipOrientation === Orientation.VERTICAL) {
+    if (areEqual(shipOrientation, Orientation.VERTICAL)) {
       const futurePosition = y + length
       if (futurePosition < 10) return true
       return false
     }
   }
+
   return {
     getCoordinates() {
       return coordinates
@@ -80,78 +128,40 @@ function Gameboard(observer) {
 
     Orientation,
 
-    placeShip(x, y, orientation) {
+    placeShip(x, y, shipOrientation) {
       // TODO: MAKE CHECK IF THE POSITION PLACEMENT POSITION IS VALID OR NOT
       // USE MOCKS HERE FOR THIS
-      if (!isValidPlacement(x, y, orientation)) {
+      if (!areEqual(shipOrientation, coordinatesOrientation)) {
+        transponse(shipOrientation)
+      }
+
+      if (!isValidPlacement(x, y, shipOrientation)) {
         observer.notify(INCORRECT_PLACEMENT_MESSAGE)
         return
       }
+
+      if (isShipInPlace(x, y, shipOrientation)) {
+        observer.notify(SHIP_ALREADY_IN_PLACE_MESSAGE)
+        return
+      }
+
       const length = availableShips.splice(0, 1)
       const ship = Ship(length)
       ships.push(ship)
       const shipPointer = ships.length - 1
 
       // When Y is always the same but X isnt ROWS
-      if (orientation === Orientation.HORIZONTAL) {
-        if (coordinatesOrientation !== Orientation.HORIZONTAL)
-          transponse(Orientation.HORIZONTAL)
-
+      if (shipOrientation === Orientation.HORIZONTAL) {
         for (let i = 0; i < length; i++) {
-          console.log(x + i)
           coordinates[y][x + i].ship = shipPointer
         }
-        // EdgeCases
-        // if (x === 0) {
-        //   for (let i = 0; i < length; i++) {
-        //     coordinates[y][x + i].ship = shipPointer
-        //   }
-        //   return
-        // }
-        // if (x === 9) {
-        //   for (let i = 0; i < length; i++) {
-        //     coordinates[y][x - i].ship = shipPointer
-        //   }
-        //   return
-        // }
-        // When the ship is not an edge take the middle of it and place it
-
-        // let upper = Math.round(length - 1 / 2)
-        // let bottom = length - upper
-        // Only if the ship is of even length if this isnt done we the board will incorrectly place the ship
-
-        // if (length % 2 === 0) {
-        //   bottom--
-        // }
-
-        //         while (upper >= 0 && bottom >= 0) {
-        //           if (upper >= 0) {
-        //             coordinates[y][x + upper].ship = shipPointer
-        //             upper--
-        //           }
-        //
-        //           if (bottom >= 0) {
-        //             coordinates[y][x - bottom].ship = shipPointer
-        //             bottom--
-        //           }
-        //         }
       }
       // When X is always the same but Y isnt COLUMNS
-      //       if (orientation === Orientation.VERTICAL) {
-      //         if (coordinatesOrientation !== Orientation.VERTICAL)
-      //           transponse(Orientation.VERTICAL)
-      //         if (y === 0) {
-      //           for (let i = 0; i < length; i++) {
-      //             coordinates[x][y + i].ship = shipPointer
-      //           }
-      //         }
-      //
-      //         if (y === 9) {
-      //           for (let i = 0; i < length; i++) {
-      //             coordinates[x][y - i].ship = shipPointer
-      //           }
-      //         }
-      //       }
+      if (shipOrientation === Orientation.VERTICAL) {
+        for (let i = 0; i < length; i++) {
+          coordinates[x][y + i].ship = shipPointer
+        }
+      }
     },
   }
 }
