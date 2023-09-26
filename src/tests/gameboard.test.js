@@ -10,6 +10,22 @@ const mockObserver = jest.fn(() => {
   }
 })
 
+test("Place a ship in vertical and horizontal position", () => {
+  const gameboard = Gameboard(mockObserver())
+  gameboard.placeShip(0, 1, gameboard.Orientation.VERTICAL)
+  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
+  expect(gameboard.getCoordinates()[0][0]).toEqual({ x: 0, y: 0, ship: 1 })
+  expect(gameboard.getCoordinates()[0][1]).toEqual({ x: 1, y: 0, ship: 1 })
+  expect(gameboard.getCoordinates()[0][2]).toEqual({ x: 2, y: 0, ship: 1 })
+  expect(notify).not.toBeCalled()
+})
+test("Check if notify gets called when a ship is already in the board coordinate", () => {
+  const gameboard = Gameboard(mockObserver())
+  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.placeShip(1, 0, gameboard.Orientation.HORIZONTAL)
+  expect(notify).toBeCalled()
+})
+
 test("Place a ship and checking its equal to the its length in the board", () => {
   const gameboard = Gameboard(mockObserver())
   gameboard.placeShip(2, 0, gameboard.Orientation.HORIZONTAL)
