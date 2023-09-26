@@ -7,6 +7,9 @@
  */
 const Ship = require("./Ship")
 function Gameboard(observer) {
+  const COLS = 10
+  const ROWS = 10
+
   const INCORRECT_PLACEMENT_MESSAGE = "Not a valid placement coordinate"
   const SHIP_ALREADY_IN_PLACE_MESSAGE = "Ship already in place"
   // Class that has the orientation parameters of  how the ships will be placed
@@ -23,10 +26,10 @@ function Gameboard(observer) {
 
   // By default the board will be done with Horizontal
   const createCoordinates = (() => {
-    for (let y = 0; y < 10; y++) {
+    for (let y = 0; y < COLS; y++) {
       // Setting empty array for each row
       coordinates.push([])
-      for (let x = 0; x < 10; x++) {
+      for (let x = 0; x < ROWS; x++) {
         coordinates[y].push({ x, y, ship: null })
       }
     }
@@ -36,18 +39,18 @@ function Gameboard(observer) {
     const arrayTransposed = []
     switch (orientation) {
       case Orientation.VERTICAL:
-        for (let x = 0; x < 10; x++) {
+        for (let x = 0; x < COLS; x++) {
           arrayTransposed.push([])
-          for (let y = 0; y < 10; y++) {
+          for (let y = 0; y < ROWS; y++) {
             arrayTransposed[x].push(coordinates[y][x])
           }
         }
         coordinatesOrientation = orientation
         break
       case Orientation.HORIZONTAL:
-        for (let y = 0; y < 10; y++) {
+        for (let y = 0; y < COLS; y++) {
           arrayTransposed.push([])
-          for (let x = 0; x < 10; x++) {
+          for (let x = 0; x < ROWS; x++) {
             arrayTransposed[y].push(coordinates[x][y])
           }
         }
@@ -145,6 +148,7 @@ function Gameboard(observer) {
         return
       }
 
+      // If any of the flag code before does not run we place the ship
       const length = availableShips.splice(0, 1)
       const ship = Ship(length)
       ships.push(ship)
