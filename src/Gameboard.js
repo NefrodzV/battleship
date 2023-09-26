@@ -6,7 +6,8 @@
  * 5 - Report whether  all the ships have been sunked or not
  */
 const Ship = require("./Ship")
-function Gameboard() {
+function Gameboard(observer) {
+  const INCORRECT_PLACEMENT_MESSAGE = "Not a valid placement coordinate"
   // Class that has the orientation parameters of  how the ships will be placed
   const Orientation = {
     VERTICAL: "Vertical", // Sets the board array to columns
@@ -28,7 +29,6 @@ function Gameboard() {
         coordinates[y].push({ x, y, ship: null })
       }
     }
-    // console.log(coordinates)
   })()
 
   const transponse = (orientation) => {
@@ -58,6 +58,21 @@ function Gameboard() {
     // }
   }
 
+  const isValidPlacement = (x, y, shipOrientation) => {
+    const length = availableShips.at(0) // The first one
+
+    if (shipOrientation === Orientation.HORIZONTAL) {
+      const futurePosition = x + length
+      if (futurePosition < 10) return true
+      return false
+    }
+
+    if (shipOrientation === Orientation.VERTICAL) {
+      const futurePosition = y + length
+      if (futurePosition < 10) return true
+      return false
+    }
+  }
   return {
     getCoordinates() {
       return coordinates
@@ -66,6 +81,12 @@ function Gameboard() {
     Orientation,
 
     placeShip(x, y, orientation) {
+      // TODO: MAKE CHECK IF THE POSITION PLACEMENT POSITION IS VALID OR NOT
+      // USE MOCKS HERE FOR THIS
+      if (!isValidPlacement(x, y, orientation)) {
+        observer.notify(INCORRECT_PLACEMENT_MESSAGE)
+        return
+      }
       const length = availableShips.splice(0, 1)
       const ship = Ship(length)
       ships.push(ship)
@@ -75,56 +96,62 @@ function Gameboard() {
       if (orientation === Orientation.HORIZONTAL) {
         if (coordinatesOrientation !== Orientation.HORIZONTAL)
           transponse(Orientation.HORIZONTAL)
-        if (x === 0) {
-          for (let i = 0; i < length; i++) {
-            coordinates[y][x + i].ship = shipPointer
-          }
-          return
+
+        for (let i = 0; i < length; i++) {
+          console.log(x + i)
+          coordinates[y][x + i].ship = shipPointer
         }
-        if (x === 9) {
-          for (let i = 0; i < length; i++) {
-            coordinates[y][x - i].ship = shipPointer
-          }
-          return
-        }
+        // EdgeCases
+        // if (x === 0) {
+        //   for (let i = 0; i < length; i++) {
+        //     coordinates[y][x + i].ship = shipPointer
+        //   }
+        //   return
+        // }
+        // if (x === 9) {
+        //   for (let i = 0; i < length; i++) {
+        //     coordinates[y][x - i].ship = shipPointer
+        //   }
+        //   return
+        // }
         // When the ship is not an edge take the middle of it and place it
 
-        let upper = Math.round(length / 2)
-        let bottom = length - upper
+        // let upper = Math.round(length - 1 / 2)
+        // let bottom = length - upper
         // Only if the ship is of even length if this isnt done we the board will incorrectly place the ship
 
-        if (length % 2 === 0) {
-          bottom--
-        }
+        // if (length % 2 === 0) {
+        //   bottom--
+        // }
 
-        while (upper >= 0 && bottom >= 0) {
-          if (upper >= 0) {
-            coordinates[y][x + upper].ship = shipPointer
-            upper--
-          }
-
-          if (bottom >= 0) {
-            coordinates[y][x - bottom].ship = shipPointer
-            bottom--
-          }
-        }
+        //         while (upper >= 0 && bottom >= 0) {
+        //           if (upper >= 0) {
+        //             coordinates[y][x + upper].ship = shipPointer
+        //             upper--
+        //           }
+        //
+        //           if (bottom >= 0) {
+        //             coordinates[y][x - bottom].ship = shipPointer
+        //             bottom--
+        //           }
+        //         }
       }
       // When X is always the same but Y isnt COLUMNS
-      if (orientation === Orientation.VERTICAL) {
-        if (coordinatesOrientation !== Orientation.VERTICAL)
-          transponse(Orientation.VERTICAL)
-        if (y === 0) {
-          for (let i = 0; i < length; i++) {
-            coordinates[x][y + i].ship = shipPointer
-          }
-        }
-
-        if (y === 9) {
-          for (let i = 0; i < length; i++) {
-            coordinates[x][y - i].ship = shipPointer
-          }
-        }
-      }
+      //       if (orientation === Orientation.VERTICAL) {
+      //         if (coordinatesOrientation !== Orientation.VERTICAL)
+      //           transponse(Orientation.VERTICAL)
+      //         if (y === 0) {
+      //           for (let i = 0; i < length; i++) {
+      //             coordinates[x][y + i].ship = shipPointer
+      //           }
+      //         }
+      //
+      //         if (y === 9) {
+      //           for (let i = 0; i < length; i++) {
+      //             coordinates[x][y - i].ship = shipPointer
+      //           }
+      //         }
+      //       }
     },
   }
 }
