@@ -1,5 +1,4 @@
 const Gameboard = require("../Gameboard")
-const Observer = require("../Observer")
 
 const subscribe = jest.fn()
 const notify = jest.fn()
@@ -26,7 +25,7 @@ test("Place a ship when its not in the edge of the board", () => {
   expect(gameboard.getCoordinates()[0][2]).toEqual({ x: 2, y: 0, ship: 0 })
 })
 
-test("place ship at the end x is 9 and sents an error", () => {
+test("place ship at the end x is 9 and observer notify function gets called", () => {
   const gameboard = Gameboard(mockObserver())
   gameboard.placeShip(9, 0, gameboard.Orientation.HORIZONTAL)
   expect(notify).toBeCalled()
