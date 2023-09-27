@@ -6,7 +6,7 @@
  * 5 - Report whether  all the ships have been sunked or not
  */
 const Ship = require("./Ship")
-function Gameboard(errorObserver) {
+function Gameboard(observer) {
   const COLS = 10
   const ROWS = 10
 
@@ -35,34 +35,6 @@ function Gameboard(errorObserver) {
       }
     }
   })()
-
-  //   const transponse = (orientation) => {
-  //     const arrayTransposed = []
-  //     switch (orientation) {
-  //       case Orientation.VERTICAL:
-  //         for (let x = 0; x < COLS; x++) {
-  //           arrayTransposed.push([])
-  //           for (let y = 0; y < ROWS; y++) {
-  //             arrayTransposed[x].push(coordinates[y][x])
-  //           }
-  //         }
-  //         coordinatesOrientation = orientation
-  //         break
-  //       case Orientation.HORIZONTAL:
-  //         for (let y = 0; y < COLS; y++) {
-  //           arrayTransposed.push([])
-  //           for (let x = 0; x < ROWS; x++) {
-  //             arrayTransposed[y].push(coordinates[x][y])
-  //           }
-  //         }
-  //         coordinatesOrientation = orientation
-  //         break
-  //
-  //       default:
-  //         console.log("Set a correct orientation")
-  //     }
-  //     coordinates = arrayTransposed
-  //   }
 
   const areEqual = (shipOrientation, correctOrientation) => {
     return shipOrientation === correctOrientation
@@ -125,11 +97,6 @@ function Gameboard(errorObserver) {
     Orientation,
 
     placeShip(x, y, shipOrientation) {
-      // Checks if the array is in the correct orientation to run the logic
-      // if (!areEqual(shipOrientation, coordinatesOrientation)) {
-      //   transponse(shipOrientation)
-      // }
-
       // If the placement goes out of bounds stop and notify user
       if (!isValidPlacement(x, y, shipOrientation)) {
         errorObserver.notify(INCORRECT_PLACEMENT_MESSAGE)
