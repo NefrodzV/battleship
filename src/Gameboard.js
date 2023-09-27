@@ -6,7 +6,7 @@
  * 5 - Report whether  all the ships have been sunked or not
  */
 const Ship = require("./Ship")
-function Gameboard(observer) {
+function Gameboard(errorObserver) {
   const COLS = 10
   const ROWS = 10
 
@@ -31,7 +31,7 @@ function Gameboard(observer) {
       // Setting empty array for each row
       coordinates.push([])
       for (let x = 0; x < COLS; x++) {
-        coordinates[y].push({ x, y, ship: null })
+        coordinates[y].push({ x, y, ship: null, miss: null })
       }
     }
   })()
@@ -127,6 +127,18 @@ function Gameboard(observer) {
           coordinates[y + i][x].ship = shipPointer
         }
       }
+    },
+
+    recieveAttack(x, y) {
+      const coordinate = coordinates[y][x]
+
+      if (coordinate.ship === null) {
+        // Need to update to send updates to the ui right here when a miss occurs
+        coordinate.miss = true
+        return
+      }
+      // Need to send updates to the ui right here when a hit occurs
+      coordinate.miss = false
     },
   }
 }
