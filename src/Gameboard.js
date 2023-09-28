@@ -6,17 +6,21 @@
  * 5 - Report whether  all the ships have been sunked or not
  */
 const Ship = require("./Ship")
-function Gameboard(errorObserver) {
+function Gameboard(errorObserver, attackObserver) {
   const COLS = 10
   const ROWS = 10
 
   const INCORRECT_PLACEMENT_MESSAGE = "Not a valid placement coordinate"
   const SHIP_ALREADY_IN_PLACE_MESSAGE = "Ship already in place"
+  const ALREADY_FIRED_COORDINATE_MESSAGE =
+    "Already fired there please select another"
+  const MISS_MESSAGE = "The attack was a miss!"
+  const HIT_MESSAGE = "We've hit an enemy ship"
 
   // Class that has the orientation parameters of  how the ships will be placed
   const Orientation = {
-    VERTICAL: "Vertical", // Sets the board array to columns
-    HORIZONTAL: "Horizontal", // Sets the board array to be rows
+    VERTICAL: "Vertical",
+    HORIZONTAL: "Horizontal",
   }
   // Available ships to place length
   const availableShips = [2, 3, 3, 4, 5]
@@ -131,14 +135,20 @@ function Gameboard(errorObserver) {
 
     recieveAttack(x, y) {
       const coordinate = coordinates[y][x]
-
+      // If this property is not null there is either a hit or miss COORDINATE HAS ALREADY BEEN ATTACKED
+      if (coordinate.miss !== null) {
+        errorObserver.notify(ALREADY_FIRED_COORDINATE_MESSAGE)
+        return
+      }
       if (coordinate.ship === null) {
         // Need to update to send updates to the ui right here when a miss occurs
         coordinate.miss = true
+        attackObserver.notify(MISS_MESSAGE)
         return
       }
       // Need to send updates to the ui right here when a hit occurs
       coordinate.miss = false
+      attackObserver.notify(HIT_MESSAGE)
     },
   }
 }
