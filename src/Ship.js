@@ -1,4 +1,4 @@
-function Ship(length) {
+function Ship(name, length) {
   let hit_points = 0
 
   const hit = () => {
@@ -13,6 +13,9 @@ function Ship(length) {
   return {
     hit,
     isSunk,
+    getName() {
+      return name
+    },
   }
 }
 
