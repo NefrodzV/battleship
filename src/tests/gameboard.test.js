@@ -1,6 +1,6 @@
 const Gameboard = require("../Gameboard")
 const messages = require("../messages")
-
+const PlayerType = require("../PlayerType")
 const messageObserver = jest.fn(() => {
   return {
     notify: jest.fn(),
@@ -25,7 +25,7 @@ afterEach(() => jest.clearAllMocks())
  */
 
 test("Notify the user when all ships are sunk and declare the winner", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
   gameboard.recieveAttack(0, 0)
   gameboard.recieveAttack(1, 0)
@@ -37,7 +37,7 @@ test("Notify the user when all ships are sunk and declare the winner", () => {
 })
 
 test("Notify the user when a ship has sunken", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
   gameboard.recieveAttack(0, 0)
   gameboard.recieveAttack(1, 0)
@@ -49,20 +49,20 @@ test("Notify the user when a ship has sunken", () => {
   })
 })
 test("Observer notifies when a coordinate has already been attacked", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.recieveAttack(0, 0) // make the first attack
   gameboard.recieveAttack(0, 0) // repeat the attack in the same coordinate
 
   expect(messageObserver.notify).toBeCalled()
   // Should be called once only when the first attack is made
   expect(messageObserver.notify).toHaveBeenCalledWith({
-    message: "Already fired there please select another coordinate!",
+    message: "Already fired there, please select another coordinate!",
     type: "Error",
   })
 })
 
 test("Register a ship hit and observer notifies the user a ship has been hit", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
   gameboard.recieveAttack(0, 0)
   expect(gameboard.getCoordinates()[0][0]).toEqual({
@@ -79,7 +79,7 @@ test("Register a ship hit and observer notifies the user a ship has been hit", (
 })
 
 test("Register a miss in the board coordinate", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.recieveAttack(0, 0)
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
@@ -94,7 +94,7 @@ test("Register a miss in the board coordinate", () => {
 })
 
 test("Place a ship in vertical and horizontal position", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(0, 1, gameboard.Orientation.VERTICAL)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
 
@@ -135,7 +135,7 @@ test("Place a ship in vertical and horizontal position", () => {
 })
 
 test("Check if errorObserver.notify gets called when a ship is already in the board coordinate", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
   gameboard.placeShip(1, 0, gameboard.Orientation.HORIZONTAL)
   expect(messageObserver.notify).toBeCalled()
@@ -146,7 +146,7 @@ test("Check if errorObserver.notify gets called when a ship is already in the bo
 })
 
 test("place ship at the end x is 9 and observer errorObserver.notify function gets called", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(9, 0, gameboard.Orientation.HORIZONTAL)
   expect(messageObserver.notify).toBeCalled()
   expect(messageObserver.notify).toHaveBeenCalledWith({
@@ -156,7 +156,7 @@ test("place ship at the end x is 9 and observer errorObserver.notify function ge
 })
 
 test("Place a ship and checking its equal to the its length in the board", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(2, 0, gameboard.Orientation.HORIZONTAL)
   expect(gameboard.getCoordinates()[0][4]).toEqual({
     x: 4,
@@ -185,7 +185,7 @@ test("Place a ship and checking its equal to the its length in the board", () =>
 })
 
 test("Place ship in gameboard in vertical position and the y is 0", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(0, 0, gameboard.Orientation.VERTICAL)
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
@@ -202,7 +202,7 @@ test("Place ship in gameboard in vertical position and the y is 0", () => {
 })
 
 test("Place ship in gameboard when the x is 0 and horizontal", () => {
-  const gameboard = Gameboard(messageObserver, messages)
+  const gameboard = Gameboard(PlayerType.COMPUTER, messageObserver, messages)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
@@ -219,8 +219,15 @@ test("Place ship in gameboard when the x is 0 and horizontal", () => {
 })
 
 test("Gameboard coordinates are 10 in length", () => {
-  expect(Gameboard(messageObserver, messages).getCoordinates().length).toBe(10)
-  expect(Gameboard(messageObserver, messages).getCoordinates()[0].length).toBe(
-    10
-  )
+  expect(
+    Gameboard(messageObserver, PlayerType.COMPUTER, messages).getCoordinates()
+      .length
+  ).toBe(10)
+  expect(
+    Gameboard(
+      messageObserver,
+      PlayerType.COMPUTER,
+      messages
+    ).getCoordinates()[0].length
+  ).toBe(10)
 })

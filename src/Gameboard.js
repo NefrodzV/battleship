@@ -5,9 +5,10 @@
  * 4 - Keep track of the missed shots so tehy can be properly rendered
  * 5 - Report whether  all the ships have been sunked or not
  */
+const PlayerType = require("./PlayerType")
 const Ship = require("./Ship")
 
-function Gameboard(messageObserver, messages) {
+function Gameboard(playerType, messageObserver, messages) {
   const COLS = 10
   const ROWS = 10
 
@@ -94,9 +95,13 @@ function Gameboard(messageObserver, messages) {
 
   const allShipsAreSunk = () => {
     const areSunk = ships.every((ship) => ship.isSunk() === true)
-    console.log(areSunk)
+
     if (areSunk) {
-      messageObserver.notify(messages.ALL_SHIPS_SUNKEN_MESSAGE)
+      if (playerType === PlayerType.COMPUTER) {
+        messageObserver.notify(messages.PLAYER_WINS_MESSAGE)
+      } else {
+        messageObserver.notify(messages.COMPUTER_WINS_MESSAGE)
+      }
     }
   }
 
@@ -105,8 +110,16 @@ function Gameboard(messageObserver, messages) {
     ship.hit()
 
     if (ship.isSunk()) {
-      messageObserver.notify(messages.SUNKEN_SHIP_MESSAGE(ship.getName()))
-
+      // If this is the computer board
+      if (playerType === PlayerType.COMPUTER) {
+        messageObserver.notify(
+          messages.PLAYER_SUNKEN_ENEMY_SHIP_MESSAGE(ship.getName())
+        )
+      } else {
+        messageObserver.notify(
+          messages.ENEMY_SUNKEN_PLAYER_SHIP_MESSAGE(ship.getName())
+        )
+      }
       allShipsAreSunk()
     }
   }
@@ -161,12 +174,20 @@ function Gameboard(messageObserver, messages) {
       if (coordinate.ship === null) {
         // Need to update to send updates to the ui right here when a miss occurs
         coordinate.miss = true
-        messageObserver.notify(messages.MISS_MESSAGE)
+        if (playerType === PlayerType.COMPUTER) {
+          messageObserver.notify(messages.PLAYER_MISS_MESSAGE)
+        }
         return
       }
       // Need to send updates to the ui right here when a hit occurs
       coordinate.miss = false
-      messageObserver.notify(messages.HIT_MESSAGE)
+
+      if (playerType === PlayerType.COMPUTER) {
+        messageObserver.notify(messages.PLAYER_HIT_MESSAGE)
+      } else {
+        messageObserver.notify(messages.ENEMY_HIT_MESSAGE)
+      }
+
       registerShipHit(coordinate.ship)
     },
   }
