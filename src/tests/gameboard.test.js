@@ -24,6 +24,18 @@ afterEach(() => jest.clearAllMocks())
  * 5- WHEN ALL SHIPS ARE SUNKED WE NOTIFY IS WE HAVE WON OR LOST
  */
 
+test("Notify the user when all ships are sunk and declare the winner", () => {
+  const gameboard = Gameboard(messageObserver, messages)
+  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.recieveAttack(0, 0)
+  gameboard.recieveAttack(1, 0)
+
+  expect(messageObserver.notify).toHaveBeenNthCalledWith(4, {
+    type: "Player",
+    message: "Enemy neutralized! We won captain!",
+  })
+})
+
 test("Notify the user when a ship has sunken", () => {
   const gameboard = Gameboard(messageObserver, messages)
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)

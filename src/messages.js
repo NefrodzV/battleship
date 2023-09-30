@@ -33,6 +33,11 @@ const playerMessages = {
       message: `We've sunken the enemy ${name} captain!`,
     }
   },
+
+  ALL_SHIPS_SUNKEN_MESSAGE: {
+    type: MessageType.PLAYER,
+    message: "Enemy neutralized! We won captain!",
+  },
 }
 
 module.exports = playerMessages

@@ -11,20 +11,6 @@ function Gameboard(messageObserver, messages) {
   const COLS = 10
   const ROWS = 10
 
-  // const messages = {
-  //   INCORRECT_PLACEMENT_MESSAGE: {
-  //     type: "Error",
-  //     message: "Not a valid placement coordinate",
-  //   },
-  // }
-
-  const SHIP_ALREADY_IN_PLACE_MESSAGE = "Ship already in place"
-  const ALREADY_FIRED_COORDINATE_MESSAGE =
-    "Already fired there please select another"
-  const MISS_MESSAGE = "The attack was a miss!"
-  const HIT_MESSAGE = "We've hit an enemy ship"
-  const SUNKEN_SHIP_MESSAGE = "We've sunken a ship!"
-
   // Class that has the orientation parameters of  how the ships will be placed
   const Orientation = {
     VERTICAL: "Vertical",
@@ -106,12 +92,22 @@ function Gameboard(messageObserver, messages) {
     }
   }
 
+  const allShipsAreSunk = () => {
+    const areSunk = ships.every((ship) => ship.isSunk() === true)
+    console.log(areSunk)
+    if (areSunk) {
+      messageObserver.notify(messages.ALL_SHIPS_SUNKEN_MESSAGE)
+    }
+  }
+
   const registerShipHit = (pointer) => {
     const ship = ships[pointer]
     ship.hit()
 
     if (ship.isSunk()) {
       messageObserver.notify(messages.SUNKEN_SHIP_MESSAGE(ship.getName()))
+
+      allShipsAreSunk()
     }
   }
 
@@ -140,7 +136,6 @@ function Gameboard(messageObserver, messages) {
       const ship = Ship(obj.name, obj.length)
       ships.push(ship)
       const shipPointer = ships.length - 1
-      console.log(obj)
 
       // When Y is always the same but X isnt. Sets the ship in the x coordinates
       if (shipOrientation === Orientation.HORIZONTAL) {
