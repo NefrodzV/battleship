@@ -8,7 +8,14 @@
 const PlayerType = require("./PlayerType")
 const Ship = require("./Ship")
 
-function Gameboard(playerType, messageObserver, messages) {
+function Gameboard(
+  playerType,
+  messages,
+  messageObserver,
+  placementObserver,
+  hitObserver,
+  sunkenObserver
+) {
   const COLS = 10
   const ROWS = 10
 
@@ -120,6 +127,7 @@ function Gameboard(playerType, messageObserver, messages) {
           messages.ENEMY_SUNKEN_PLAYER_SHIP_MESSAGE(ship.getName())
         )
       }
+      sunkenObserver.notify(pointer)
       allShipsAreSunk()
     }
   }
@@ -162,6 +170,10 @@ function Gameboard(playerType, messageObserver, messages) {
           coordinates[y + i][x].ship = shipPointer
         }
       }
+
+      // DONT KNOW WHAT TO PASS HERE TO RENDER THE SHIP PLACEMENT THIS NEEDS
+      // TO VBE VERIFIED LATER ON
+      placementObserver.notify({ x, y, shipOrientation })
     },
 
     recieveAttack(x, y) {
@@ -187,7 +199,7 @@ function Gameboard(playerType, messageObserver, messages) {
       } else {
         messageObserver.notify(messages.ENEMY_HIT_MESSAGE)
       }
-
+      hitObserver.notify({ x, y })
       registerShipHit(coordinate.ship)
     },
   }
