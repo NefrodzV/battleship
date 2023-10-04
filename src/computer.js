@@ -30,4 +30,4 @@ const computer = (function Computer() {
   }
 })()
 
-module.exports = computer
+export { computer }

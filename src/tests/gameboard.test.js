@@ -1,6 +1,6 @@
-const Gameboard = require("../Gameboard")
-const messages = require("../messages")
-const PlayerType = require("../PlayerType")
+import Gameboard from "../Gameboard"
+import { messages } from "../messages"
+import { PlayerType } from "../PlayerType"
 const messageObserver = jest.fn(() => {
   return {
     notify: jest.fn(),

@@ -1,4 +1,4 @@
-const computer = require("../computer")
+import { computer } from "../computer"
 
 test("Fire function must not return duplicate objects", () => {
   const values = []

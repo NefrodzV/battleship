@@ -1,4 +1,4 @@
-MessageType = {
+const MessageType = {
   ERROR: "Error",
   ENEMY: "Enemy",
   PLAYER: "Player",
@@ -61,4 +61,4 @@ const messages = {
   },
 }
 
-module.exports = messages
+export { messages }

@@ -3,4 +3,4 @@ const PlayerType = {
   COMPUTER: "Computer", // Computer
 }
 
-module.exports = PlayerType
+export { PlayerType }

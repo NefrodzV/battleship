@@ -1,7 +1,7 @@
-const PlayerType = require("./PlayerType")
-const computer = require("./computer")
+import { PlayerType } from "./PlayerType"
+import { computer } from "./computer"
 
-function Player(name, type) {
+export default function Player(name, type) {
   if (type === PlayerType.COMPUTER) {
     return {
       name,
@@ -14,5 +14,3 @@ function Player(name, type) {
     type,
   }
 }
-
-module.exports = Player

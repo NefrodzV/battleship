@@ -1,4 +1,4 @@
-function Ship(name, length) {
+export default function Ship(name, length) {
   let hit_points = 0
 
   const hit = () => {
@@ -18,5 +18,3 @@ function Ship(name, length) {
     },
   }
 }
-
-module.exports = Ship

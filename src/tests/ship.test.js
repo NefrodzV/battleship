@@ -1,4 +1,4 @@
-const Ship = require("../Ship")
+import Ship from "../Ship"
 
 test("Ship not sunken when hits arent equal to length", () => {
   const ship = Ship("Cruiser", 3)

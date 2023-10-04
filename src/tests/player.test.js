@@ -1,6 +1,6 @@
-const Player = require("../Player")
-const PlayerType = require("../PlayerType")
-const computer = require("../computer")
+import { PlayerType } from "../PlayerType"
+import Player from "../Player"
+import { computer } from "../computer"
 
 test("Player with PlayerType.COMPUTER should return the object the computer module ", () => {
   const player = Player("Willy", PlayerType.COMPUTER)

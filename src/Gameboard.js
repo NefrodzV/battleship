@@ -5,10 +5,10 @@
  * 4 - Keep track of the missed shots so tehy can be properly rendered
  * 5 - Report whether  all the ships have been sunked or not
  */
-const PlayerType = require("./PlayerType")
-const Ship = require("./Ship")
+import { PlayerType } from "./PlayerType"
+import Ship from "./Ship"
 
-function Gameboard(
+export default function Gameboard(
   playerType,
   messages,
   messageObserver,
@@ -204,5 +204,3 @@ function Gameboard(
     },
   }
 }
-
-module.exports = Gameboard
