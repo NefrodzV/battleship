@@ -8,7 +8,7 @@
 import { PlayerType } from "./PlayerType"
 import Ship from "./Ship"
 
-export default function Gameboard(
+export default function Board(
   playerType,
   messages,
   messageObserver,

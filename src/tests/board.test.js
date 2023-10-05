@@ -1,4 +1,4 @@
-import Gameboard from "../Gameboard"
+import Board from "../Board"
 import { messages } from "../messages"
 import { PlayerType } from "../PlayerType"
 const messageObserver = jest.fn(() => {
@@ -37,7 +37,7 @@ afterEach(() => jest.clearAllMocks())
  */
 
 test("Notify the user when all ships are sunk and declare the winner", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -56,7 +56,7 @@ test("Notify the user when all ships are sunk and declare the winner", () => {
 })
 
 test("Notify the user when a ship has sunken", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -76,7 +76,7 @@ test("Notify the user when a ship has sunken", () => {
   expect(sunkenObserver.notify).toBeCalled()
 })
 test("Observer notifies when a coordinate has already been attacked", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -95,7 +95,7 @@ test("Observer notifies when a coordinate has already been attacked", () => {
 })
 
 test("Register a ship hit and observer notifies the user a ship has been hit", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -119,7 +119,7 @@ test("Register a ship hit and observer notifies the user a ship has been hit", (
 })
 
 test("Register a miss in the board coordinate", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -140,7 +140,7 @@ test("Register a miss in the board coordinate", () => {
 })
 
 test("Place a ship in vertical and horizontal position", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -187,7 +187,7 @@ test("Place a ship in vertical and horizontal position", () => {
 })
 
 test("Check if messageObserver notify gets called when a ship is already in the board coordinate", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -204,7 +204,7 @@ test("Check if messageObserver notify gets called when a ship is already in the 
 })
 
 test("place ship at the end x is 9 and messageObserver notify function gets called", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -220,7 +220,7 @@ test("place ship at the end x is 9 and messageObserver notify function gets call
 })
 
 test("Place a ship and checking its equal to the its length in the board", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -255,7 +255,7 @@ test("Place a ship and checking its equal to the its length in the board", () =>
 })
 
 test("Place ship in gameboard in vertical position and the y is 0", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -278,7 +278,7 @@ test("Place ship in gameboard in vertical position and the y is 0", () => {
 })
 
 test("Place ship in gameboard when the x is 0 and horizontal", () => {
-  const gameboard = Gameboard(
+  const gameboard = Board(
     PlayerType.COMPUTER,
     messages,
     messageObserver,
@@ -302,14 +302,11 @@ test("Place ship in gameboard when the x is 0 and horizontal", () => {
 
 test("Gameboard coordinates are 10 in length", () => {
   expect(
-    Gameboard(messageObserver, PlayerType.COMPUTER, messages).getCoordinates()
+    Board(messageObserver, PlayerType.COMPUTER, messages).getCoordinates()
       .length
   ).toBe(10)
   expect(
-    Gameboard(
-      messageObserver,
-      PlayerType.COMPUTER,
-      messages
-    ).getCoordinates()[0].length
+    Board(messageObserver, PlayerType.COMPUTER, messages).getCoordinates()[0]
+      .length
   ).toBe(10)
 })
