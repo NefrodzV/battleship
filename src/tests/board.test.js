@@ -30,14 +30,29 @@ const player = Player("AI", PlayerType.COMPUTER)
 
 afterEach(() => jest.clearAllMocks())
 
-//TODO: MAKE TEST TO SEND MESSAGE TO UI TO REGISTER HITS AND MAKE TEST FOR THE HITS OF SHIPS
-/**HITS OF SHIPS LOGIC
- * 1- THE UI SENDS A FIRE TO THE OPPOSITE SIDE DONE!
- * 2- WE RUN THE FUNCTION AND CHECK IF THE COORDINATE IS ALREADY HIT DONE!
- * 3- WE MARK THE GRID ALREADY HIT/FIRED DONE!
- * 4- WHEN SHIP IS SUNK WE NOTIFY THE USER
- * 5- WHEN ALL SHIPS ARE SUNKED WE NOTIFY IS WE HAVE WON OR LOST
- */
+test("Get the outline with depending on the ship length and orientation", () => {
+  const gameboard = Board(
+    player,
+    messages,
+    messageObserver,
+    placementObserver,
+    hitObserver,
+    sunkenObserver
+  )
+  expect(gameboard.getOutline(0, 0, gameboard.Orientation.HORIZONTAL)).toEqual({
+    coordinates: [
+      {
+        x: 0,
+        y: 0,
+      },
+      {
+        x: 1,
+        y: 0,
+      },
+    ],
+    clr: "black",
+  })
+})
 
 test("Notify the user when all ships are sunk and declare the winner", () => {
   const gameboard = Board(
@@ -67,7 +82,7 @@ test("Notify the user when a ship has sunken", () => {
     hitObserver,
     sunkenObserver
   )
-  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.placeShip(0, 0)
   gameboard.recieveAttack(0, 0)
   gameboard.recieveAttack(1, 0)
 
@@ -105,7 +120,7 @@ test("Register a ship hit and observer notifies the user a ship has been hit", (
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.placeShip(0, 0)
   gameboard.recieveAttack(0, 0)
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
@@ -150,8 +165,10 @@ test("Place a ship in vertical and horizontal position", () => {
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(0, 1, gameboard.Orientation.VERTICAL)
-  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.updateShipOrientation()
+  gameboard.placeShip(0, 1)
+  gameboard.updateShipOrientation()
+  gameboard.placeShip(0, 0)
 
   // First ship position
   expect(gameboard.getCoordinates()[1][0]).toEqual({
@@ -197,8 +214,8 @@ test("Check if messageObserver notify gets called when a ship is already in the 
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
-  gameboard.placeShip(1, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.placeShip(0, 0)
+  gameboard.placeShip(1, 0)
   expect(messageObserver.notify).toBeCalled()
   expect(messageObserver.notify).toHaveBeenCalledWith({
     type: "Error",
@@ -214,7 +231,7 @@ test("place ship at the end x is 9 and messageObserver notify function gets call
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(9, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.placeShip(9, 0)
   expect(messageObserver.notify).toBeCalled()
   expect(messageObserver.notify).toHaveBeenCalledWith({
     type: "Error",
@@ -230,7 +247,7 @@ test("Place a ship and checking its equal to the its length in the board", () =>
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(2, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.placeShip(2, 0)
   expect(gameboard.getCoordinates()[0][4]).toEqual({
     x: 4,
     y: 0,
@@ -265,7 +282,10 @@ test("Place ship in gameboard in vertical position and the y is 0", () => {
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(0, 0, gameboard.Orientation.VERTICAL)
+
+  gameboard.updateShipOrientation()
+  gameboard.placeShip(0, 0)
+
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
     y: 0,
@@ -288,7 +308,7 @@ test("Place ship in gameboard when the x is 0 and horizontal", () => {
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
+  gameboard.placeShip(0, 0)
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
     y: 0,
@@ -304,10 +324,24 @@ test("Place ship in gameboard when the x is 0 and horizontal", () => {
 })
 
 test("Gameboard coordinates are 10 in length", () => {
-  expect(Board(messageObserver, player, messages).getCoordinates().length).toBe(
-    10
-  )
   expect(
-    Board(messageObserver, player, messages).getCoordinates()[0].length
+    Board(
+      player,
+      messages,
+      messageObserver,
+      placementObserver,
+      hitObserver,
+      sunkenObserver
+    ).getCoordinates().length
+  ).toBe(10)
+  expect(
+    Board(
+      player,
+      messages,
+      messageObserver,
+      placementObserver,
+      hitObserver,
+      sunkenObserver
+    ).getCoordinates()[0].length
   ).toBe(10)
 })

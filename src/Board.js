@@ -36,6 +36,9 @@ export default function Board(
 
   let coordinates = []
 
+  let isDropping = player.isHuman() ? true : false
+  let shipOrientation = Orientation.HORIZONTAL
+
   // By default the board will be done with Horizontal
   const createCoordinates = (() => {
     for (let y = 0; y < ROWS; y++) {
@@ -51,7 +54,7 @@ export default function Board(
     return shipOrientation === correctOrientation
   }
 
-  const isShipInPlace = (x, y, shipOrientation) => {
+  const isShipInPlace = (x, y) => {
     const length = availableShips.at(0).length
     let spaceTaken = null
 
@@ -84,7 +87,7 @@ export default function Board(
 
     return spaceTaken
   }
-  const isValidPlacement = (x, y, shipOrientation) => {
+  const isValidPlacement = (x, y) => {
     const length = availableShips.at(0).length // The first one
 
     if (areEqual(shipOrientation, Orientation.HORIZONTAL)) {
@@ -139,15 +142,17 @@ export default function Board(
 
     Orientation,
 
-    placeShip(x, y, shipOrientation) {
+    placeShip(x, y) {
       // If the placement goes out of bounds stop and notify user
-      if (!isValidPlacement(x, y, shipOrientation)) {
+      if (!isValidPlacement(x, y)) {
+        console.log("Not valid placement")
         messageObserver.notify(messages.INCORRECT_PLACEMENT_MESSAGE)
         return
       }
 
       // If there is a ship already in place stop and notify user
-      if (isShipInPlace(x, y, shipOrientation)) {
+      if (isShipInPlace(x, y)) {
+        console.log("Ship aleready in place")
         messageObserver.notify(messages.SHIP_ALREADY_IN_PLACE_MESSAGE)
         return
       }
@@ -202,8 +207,52 @@ export default function Board(
       hitObserver.notify({ x, y })
       registerShipHit(coordinate.ship)
     },
-    getBoardOwner() {
+    getPlayer() {
       return player
+    },
+
+    getOutline(x, y) {
+      const MAX = 9
+      const ERROR_CLR = "red"
+      const OUTLINE_CLR = "black"
+
+      let currentColor = OUTLINE_CLR
+      const shipLength = availableShips.at(0).length
+      const squares = []
+      if (shipOrientation === Orientation.HORIZONTAL) {
+        for (let i = 0; i < shipLength; i++) {
+          const currentX = x + i
+          if (currentX > 9) {
+            currentColor = ERROR_CLR
+            break
+          }
+          squares.push({ x: currentX, y: y })
+        }
+      } else if (shipOrientation === Orientation.VERTICAL) {
+        for (let i = 0; i < shipLength; i++) {
+          const currentY = y + i
+          if (currentY > MAX) {
+            currentColor = ERROR_CLR
+            break
+          }
+          squares.push({ x: x, y: currentY })
+        }
+      }
+
+      return { coordinates: squares, clr: currentColor }
+    },
+
+    isPlacingShips() {
+      return isDropping
+    },
+
+    updateShipOrientation() {
+      if (shipOrientation === Orientation.HORIZONTAL) {
+        shipOrientation = Orientation.VERTICAL
+        return shipOrientation
+      }
+      shipOrientation = Orientation.HORIZONTAL
+      return shipOrientation
     },
   }
 }
