@@ -9,7 +9,7 @@ import { PlayerType } from "./PlayerType"
 import Ship from "./Ship"
 
 export default function Board(
-  playerType,
+  player,
   messages,
   messageObserver,
   placementObserver,
@@ -104,7 +104,7 @@ export default function Board(
     const areSunk = ships.every((ship) => ship.isSunk() === true)
 
     if (areSunk) {
-      if (playerType === PlayerType.COMPUTER) {
+      if (player.type === PlayerType.COMPUTER) {
         messageObserver.notify(messages.PLAYER_WINS_MESSAGE)
       } else {
         messageObserver.notify(messages.COMPUTER_WINS_MESSAGE)
@@ -118,7 +118,7 @@ export default function Board(
 
     if (ship.isSunk()) {
       // If this is the computer board
-      if (playerType === PlayerType.COMPUTER) {
+      if (player.type === PlayerType.COMPUTER) {
         messageObserver.notify(
           messages.PLAYER_SUNKEN_ENEMY_SHIP_MESSAGE(ship.getName())
         )
@@ -186,7 +186,7 @@ export default function Board(
       if (coordinate.ship === null) {
         // Need to update to send updates to the ui right here when a miss occurs
         coordinate.miss = true
-        if (playerType === PlayerType.COMPUTER) {
+        if (player.type === PlayerType.COMPUTER) {
           messageObserver.notify(messages.PLAYER_MISS_MESSAGE)
         }
         return
@@ -194,13 +194,16 @@ export default function Board(
       // Need to send updates to the ui right here when a hit occurs
       coordinate.miss = false
 
-      if (playerType === PlayerType.COMPUTER) {
+      if (player.type === PlayerType.COMPUTER) {
         messageObserver.notify(messages.PLAYER_HIT_MESSAGE)
       } else {
         messageObserver.notify(messages.ENEMY_HIT_MESSAGE)
       }
       hitObserver.notify({ x, y })
       registerShipHit(coordinate.ship)
+    },
+    getBoardOwner() {
+      return player
     },
   }
 }
