@@ -1,13 +1,7 @@
-/** TODOS:
- * 1 - Should be placeable  to place ships in a board coordinate
- * 2 - Have a attack function  that determines whether a ship was hit or not.
- * 3 - have the correct ship be attacked when hit or marked the coordinates as already shot
- * 4 - Keep track of the missed shots so tehy can be properly rendered
- * 5 - Report whether  all the ships have been sunked or not
- */
 import { PlayerType } from "./PlayerType"
 import Ship from "./Ship"
 
+// TODO  Remove parameters that are unneed messages and all the observers
 export default function Board(
   player,
   messages,
@@ -23,6 +17,16 @@ export default function Board(
   const Orientation = {
     VERTICAL: "Vertical",
     HORIZONTAL: "Horizontal",
+  }
+
+  const Status = {
+    ERROR: false,
+    OK: true,
+  }
+
+  const MessageType = {
+    ERROR: "error",
+    OK: "ok",
   }
   // Available ships to place length
   const availableShips = [
@@ -91,13 +95,15 @@ export default function Board(
     const length = availableShips.at(0).length // The first one
 
     if (areEqual(shipOrientation, Orientation.HORIZONTAL)) {
-      const futurePosition = x + length
+      const futurePosition = x + length - 1
+      console.log(futurePosition)
       if (futurePosition < 10) return true
       return false
     }
 
     if (areEqual(shipOrientation, Orientation.VERTICAL)) {
-      const futurePosition = y + length
+      const futurePosition = y + length - 1
+      console.log(futurePosition)
       if (futurePosition < 10) return true
       return false
     }
@@ -147,14 +153,18 @@ export default function Board(
       if (!isValidPlacement(x, y)) {
         console.log("Not valid placement")
         messageObserver.notify(messages.INCORRECT_PLACEMENT_MESSAGE)
-        return
+        return {
+          status: Status.ERROR,
+          type: MessageType.ERROR,
+          msg: "Invalid placement",
+        }
       }
 
       // If there is a ship already in place stop and notify user
       if (isShipInPlace(x, y)) {
         console.log("Ship aleready in place")
         messageObserver.notify(messages.SHIP_ALREADY_IN_PLACE_MESSAGE)
-        return
+        return { status: Status.ERROR, msg: "Ship already in place" }
       }
 
       // If any of the flag code before does not run we place the ship
