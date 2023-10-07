@@ -4,7 +4,6 @@ import Ship from "./Ship"
 // TODO  Remove parameters that are unneed messages and all the observers
 export default function Board(
   player,
-  messages,
   messageObserver,
   placementObserver,
   hitObserver,
@@ -125,20 +124,20 @@ export default function Board(
     const ship = ships[pointer]
     ship.hit()
 
-    if (ship.isSunk()) {
-      // If this is the computer board
-      if (player.type === PlayerType.COMPUTER) {
-        messageObserver.notify(
-          messages.PLAYER_SUNKEN_ENEMY_SHIP_MESSAGE(ship.getName())
-        )
-      } else {
-        messageObserver.notify(
-          messages.ENEMY_SUNKEN_PLAYER_SHIP_MESSAGE(ship.getName())
-        )
-      }
-      sunkenObserver.notify(pointer)
-      allShipsAreSunk()
-    }
+    // if (ship.isSunk()) {
+    //   // If this is the computer board
+    //   if (player.type === PlayerType.COMPUTER) {
+    //     // messageObserver.notify(
+    //     //   messages.PLAYER_SUNKEN_ENEMY_SHIP_MESSAGE(ship.getName())
+    //     // )
+    //   } else {
+    //     // messageObserver.notify(
+    //     //   messages.ENEMY_SUNKEN_PLAYER_SHIP_MESSAGE(ship.getName())
+    //     // )
+    //   }
+    //   // sunkenObserver.notify(pointer)
+    //   allShipsAreSunk()
+    // }
   }
 
   return {
@@ -151,8 +150,6 @@ export default function Board(
     placeShip(x, y) {
       // If the placement goes out of bounds stop and notify user
       if (!isValidPlacement(x, y)) {
-        console.log("Not valid placement")
-        messageObserver.notify(messages.INCORRECT_PLACEMENT_MESSAGE)
         return {
           status: Status.ERROR,
           type: MessageType.ERROR,
@@ -162,9 +159,11 @@ export default function Board(
 
       // If there is a ship already in place stop and notify user
       if (isShipInPlace(x, y)) {
-        console.log("Ship aleready in place")
-        messageObserver.notify(messages.SHIP_ALREADY_IN_PLACE_MESSAGE)
-        return { status: Status.ERROR, msg: "Ship already in place" }
+        return {
+          status: Status.ERROR,
+          type: MessageType.ERROR,
+          msg: "Ship already in place",
+        }
       }
 
       // If any of the flag code before does not run we place the ship
@@ -173,49 +172,66 @@ export default function Board(
       ships.push(ship)
       const shipPointer = ships.length - 1
 
+      // Coordinates to return to render in the ui
+      const squares = []
+
       // When Y is always the same but X isnt. Sets the ship in the x coordinates
       if (shipOrientation === Orientation.HORIZONTAL) {
         for (let i = 0; i < obj.length; i++) {
-          coordinates[y][x + i].ship = shipPointer
+          const currentX = x + i
+          coordinates[y][currentX].ship = shipPointer
+          squares.push({ x: currentX, y: y })
         }
       }
       // When X is always the same but Y isnt. Sets the ship in the y coordinates
       if (shipOrientation === Orientation.VERTICAL) {
         for (let i = 0; i < obj.length; i++) {
-          coordinates[y + i][x].ship = shipPointer
+          const currentY = y + i
+          coordinates[currentY][x].ship = shipPointer
+          squares.push({ x: x, y: currentY })
         }
       }
-
-      // DONT KNOW WHAT TO PASS HERE TO RENDER THE SHIP PLACEMENT THIS NEEDS
-      // TO VBE VERIFIED LATER ON
-      placementObserver.notify({ x, y, shipOrientation })
+      return { status: Status.OK, squares }
     },
 
     recieveAttack(x, y) {
+      const MISS_CLR = "miss"
+      const HIT_CLR = "hit"
+      const SUNKEN_CLR = "sunk"
+
       const coordinate = coordinates[y][x]
       // If this property is not null there is either a hit or miss COORDINATE HAS ALREADY BEEN ATTACKED
       if (coordinate.miss !== null) {
-        messageObserver.notify(messages.ALREADY_FIRED_COORDINATE_MESSAGE)
-        return
+        // messageObserver.notify(messages.ALREADY_FIRED_COORDINATE_MESSAGE)
+        return {
+          status: Status.ERROR,
+          type: MessageType.ERROR,
+          msg: "Coordinate already fired!",
+        }
       }
       if (coordinate.ship === null) {
         // Need to update to send updates to the ui right here when a miss occurs
         coordinate.miss = true
-        if (player.type === PlayerType.COMPUTER) {
-          messageObserver.notify(messages.PLAYER_MISS_MESSAGE)
-        }
-        return
+        // if (player.type === PlayerType.COMPUTER) {
+        //   // messageObserver.notify(messages.PLAYER_MISS_MESSAGE)
+        // }
+        // TODO : Implement what so send to the ui when ship is not in the coordinate
+        return { status: Status.OK, render: MISS_CLR }
       }
       // Need to send updates to the ui right here when a hit occurs
       coordinate.miss = false
 
-      if (player.type === PlayerType.COMPUTER) {
-        messageObserver.notify(messages.PLAYER_HIT_MESSAGE)
-      } else {
-        messageObserver.notify(messages.ENEMY_HIT_MESSAGE)
+      // TODO: Implement the data to be returned to the ui when a ship is hit
+      const ship = ships[pointer]
+      ship.hit()
+      if (ship.isSunk()) {
+        return { status: Status.OK, render: SUNKEN_CLR }
       }
-      hitObserver.notify({ x, y })
       registerShipHit(coordinate.ship)
+
+      // {status: Status.OK , render: HIT_CLR}
+
+      // hitObserver.notify({ x, y })
     },
     getPlayer() {
       return player
@@ -263,6 +279,13 @@ export default function Board(
       }
       shipOrientation = Orientation.HORIZONTAL
       return shipOrientation
+    },
+    shipHasSunk(ship) {
+      if (ship.isSunk()) {
+        return
+      }
+
+      return null
     },
   }
 }

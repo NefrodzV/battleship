@@ -112,7 +112,7 @@ test("Observer notifies when a coordinate has already been attacked", () => {
   })
 })
 
-test("Register a ship hit and observer notifies the user a ship has been hit", () => {
+test.only("Register a ship hit and observer notifies the user a ship has been hit", () => {
   const gameboard = Board(
     player,
     messages,
@@ -121,7 +121,7 @@ test("Register a ship hit and observer notifies the user a ship has been hit", (
     hitObserver
   )
   gameboard.placeShip(0, 0)
-  gameboard.recieveAttack(0, 0)
+  expect(gameboard.recieveAttack(0, 0)).toEqual({})
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
     y: 0,
@@ -129,11 +129,11 @@ test("Register a ship hit and observer notifies the user a ship has been hit", (
     miss: false,
   })
 
-  expect(messageObserver.notify).toHaveBeenCalledWith({
-    message: "We've hit an enemy ship captain!",
-    type: "Player",
-  })
-  expect(hitObserver.notify).toBeCalled()
+  // expect(messageObserver.notify).toHaveBeenCalledWith({
+  //   message: "We've hit an enemy ship captain!",
+  //   type: "Player",
+  // })
+  // expect(hitObserver.notify).toBeCalled()
 })
 
 test("Register a miss in the board coordinate", () => {
@@ -144,20 +144,82 @@ test("Register a miss in the board coordinate", () => {
     placementObserver,
     hitObserver
   )
-  gameboard.recieveAttack(0, 0)
+  expect(gameboard.recieveAttack(0, 0)).toEqual({})
   expect(gameboard.getCoordinates()[0][0]).toEqual({
     x: 0,
     y: 0,
     ship: null,
     miss: true,
   })
-  expect(messageObserver.notify).toHaveBeenCalledWith({
-    message: "The attack was a MISS captain!",
-    type: "Player",
-  })
+  // expect(messageObserver.notify).toHaveBeenCalledWith({
+  //   message: "The attack was a MISS captain!",
+  //   type: "Player",
+  // })
 })
 
-test("Place a ship in vertical and horizontal position", () => {
+test(
+  "Each placement returns a array of coordinates to render in ui and makes sure they are register" +
+    " in the data board as well",
+  () => {
+    const gameboard = Board(
+      player,
+      messages,
+      messageObserver,
+      placementObserver,
+      hitObserver
+    )
+    // Change the ship to be place to vertical position
+    gameboard.updateShipOrientation()
+    expect(gameboard.placeShip(0, 1)).toEqual([
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+    ])
+    gameboard.updateShipOrientation()
+
+    expect(gameboard.placeShip(0, 0)).toEqual([
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
+    ])
+
+    // First ship position in the board
+    expect(gameboard.getCoordinates()[1][0]).toEqual({
+      x: 0,
+      y: 1,
+      ship: 0,
+      miss: null,
+    })
+    expect(gameboard.getCoordinates()[2][0]).toEqual({
+      x: 0,
+      y: 2,
+      ship: 0,
+      miss: null,
+    })
+    // Second ship position in the board
+    expect(gameboard.getCoordinates()[0][0]).toEqual({
+      x: 0,
+      y: 0,
+      ship: 1,
+      miss: null,
+    })
+    expect(gameboard.getCoordinates()[0][1]).toEqual({
+      x: 1,
+      y: 0,
+      ship: 1,
+      miss: null,
+    })
+    expect(gameboard.getCoordinates()[0][2]).toEqual({
+      x: 2,
+      y: 0,
+      ship: 1,
+      miss: null,
+    })
+    // expect(placementObserver.notify).toBeCalled()
+    // expect(messageObserver.notify).not.toBeCalled()
+  }
+)
+
+test("Returns error object when ship is already in the coordinate", () => {
   const gameboard = Board(
     player,
     messages,
@@ -165,48 +227,19 @@ test("Place a ship in vertical and horizontal position", () => {
     placementObserver,
     hitObserver
   )
-  gameboard.updateShipOrientation()
-  gameboard.placeShip(0, 1)
-  gameboard.updateShipOrientation()
   gameboard.placeShip(0, 0)
-
-  // First ship position
-  expect(gameboard.getCoordinates()[1][0]).toEqual({
-    x: 0,
-    y: 1,
-    ship: 0,
-    miss: null,
-  })
-  expect(gameboard.getCoordinates()[2][0]).toEqual({
-    x: 0,
-    y: 2,
-    ship: 0,
-    miss: null,
-  })
-  // Second ship position
-  expect(gameboard.getCoordinates()[0][0]).toEqual({
-    x: 0,
-    y: 0,
-    ship: 1,
-    miss: null,
-  })
-  expect(gameboard.getCoordinates()[0][1]).toEqual({
-    x: 1,
-    y: 0,
-    ship: 1,
-    miss: null,
-  })
-  expect(gameboard.getCoordinates()[0][2]).toEqual({
-    x: 2,
-    y: 0,
-    ship: 1,
-    miss: null,
-  })
-  expect(placementObserver.notify).toBeCalled()
-  expect(messageObserver.notify).not.toBeCalled()
+  expect(gameboard.placeShip(1, 0)).toEqual({
+    msg: "Ship already in place",
+    status: false,
+    type: "error",
+  }) // expect(messageObserver.notify).toBeCalled()
+  // expect(messageObserver.notify).toHaveBeenCalledWith({
+  //   type: "Error",
+  //   message: "Ship already in place!",
+  // })
 })
 
-test("Check if messageObserver notify gets called when a ship is already in the board coordinate", () => {
+test("Returns error object when a ship will be place out of bounds", () => {
   const gameboard = Board(
     player,
     messages,
@@ -214,29 +247,16 @@ test("Check if messageObserver notify gets called when a ship is already in the 
     placementObserver,
     hitObserver
   )
-  gameboard.placeShip(0, 0)
-  gameboard.placeShip(1, 0)
-  expect(messageObserver.notify).toBeCalled()
-  expect(messageObserver.notify).toHaveBeenCalledWith({
-    type: "Error",
-    message: "Ship already in place!",
+  expect(gameboard.placeShip(9, 0)).toEqual({
+    msg: "Invalid placement",
+    status: false,
+    type: "error",
   })
-})
-
-test("place ship at the end x is 9 and messageObserver notify function gets called", () => {
-  const gameboard = Board(
-    player,
-    messages,
-    messageObserver,
-    placementObserver,
-    hitObserver
-  )
-  gameboard.placeShip(9, 0)
-  expect(messageObserver.notify).toBeCalled()
-  expect(messageObserver.notify).toHaveBeenCalledWith({
-    type: "Error",
-    message: "Not a valid placement coordinate",
-  })
+  // expect(messageObserver.notify).toBeCalled()
+  // expect(messageObserver.notify).toHaveBeenCalledWith({
+  //   type: "Error",
+  //   message: "Not a valid placement coordinate",
+  // })
 })
 
 test("Place a ship and checking its equal to the its length in the board", () => {
