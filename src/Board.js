@@ -191,7 +191,8 @@ export default function Board(
           squares.push({ x: x, y: currentY })
         }
       }
-      return { status: Status.OK, squares }
+
+      return { status: Status.OK, coordinates: squares }
     },
 
     recieveAttack(x, y) {
@@ -252,6 +253,7 @@ export default function Board(
             currentColor = ERROR_CLR
             break
           }
+          if (coordinates[y][currentX].ship !== null) currentColor = ERROR_CLR
           squares.push({ x: currentX, y: y })
         }
       } else if (shipOrientation === Orientation.VERTICAL) {
@@ -261,6 +263,7 @@ export default function Board(
             currentColor = ERROR_CLR
             break
           }
+          if (coordinates[currentY][x].ship !== null) currentColor = ERROR_CLR
           squares.push({ x: x, y: currentY })
         }
       }
@@ -268,8 +271,9 @@ export default function Board(
       return { coordinates: squares, clr: currentColor }
     },
 
-    isPlacingShips() {
-      return isDropping
+    hasShipsAvailable() {
+      if(availableShips.length > 0) return true
+      return false
     },
 
     updateShipOrientation() {
