@@ -24,7 +24,6 @@ export default function BoardComponent(object, callback) {
 
   // Renders the outline when the board is in the placing phase
   function showOutline(x, y) {
-    console.log(x, y)
     const outlineObject = object.getOutline(x, y)
     outlineObject.coordinates.forEach((coordinate) => {
       const key = `${coordinate.x}${coordinate.y}`
@@ -65,15 +64,21 @@ export default function BoardComponent(object, callback) {
       return false
     }
 
-    console.log("setting ship")
     result.coordinates.forEach((coordinate) => {
       const key = `${coordinate.x}${coordinate.y}`
       const element = coordinatesMap.get(key)
-      element.changeColor("black", true)
       element.updateHasShip()
-      // element.removeMouseOut()
-      // element.removeMouseOver()
+      element.changeColor()
+      
     })
+
+    // If all the ships have been placed remove the listener for placement
+    if(!object.hasShipsAvailable()) {
+      coordinatesMap.forEach(coordinate => {
+        coordinate.removeMouseOut()
+        coordinate.removeMouseOver()
+      })
+    }
   }
 
   // Marks a hit in the board
@@ -82,9 +87,9 @@ export default function BoardComponent(object, callback) {
   // updates when a shit has been sunk
   const updateShipStatus = () => {}
 
-  // Class to make the coordinate element with its event handler
+  // Class to make the coordinate element with its event handlers
   function CoordinateComponent(x, y, hasShip = false) {
-    let shipClr = "gray"
+    const SHIP_CLR = "gray"
     const STYLE = "coordinate"
     const coordinateElement = document.createElement("div")
     coordinateElement.classList.add(STYLE)
@@ -92,12 +97,11 @@ export default function BoardComponent(object, callback) {
     
     const changeColor = (clr = "aqua", saveColor) => {
       if (hasShip) {
-        coordinateElement.style.backgroundColor = shipClr
+        coordinateElement.style.backgroundColor = SHIP_CLR
         return
       }
       coordinateElement.style.backgroundColor = clr
     }
-
 
     const mouseOverHandler = () => {
       showOutline(x, y)
@@ -109,25 +113,19 @@ export default function BoardComponent(object, callback) {
 
     const setShipHandler = () => {
       setShip(x, y)
+      
     }
 
     const hitShipHandler = () => {}
     // Event listeners only added when the player is human and ships are being placed
     if (object.hasShipsAvailable()) {
       coordinateElement.addEventListener("click", setShipHandler)
-
       coordinateElement.addEventListener("mouseover", mouseOverHandler)
-
       coordinateElement.addEventListener("mouseout", mouseOutHandler)
     }
 
-    
-    const updatePointer = (int) => {
-      pointer = int
-    }
-
     const removeMouseOver = () => {
-      coordinateElement.removeEventListener("mouseover", mouseOutHandler)
+      coordinateElement.removeEventListener("mouseover", mouseOverHandler)
     }
 
     const removeMouseOut = () => {
@@ -137,7 +135,6 @@ export default function BoardComponent(object, callback) {
     return {
       coordinateElement,
       changeColor,
-      updatePointer,
       removeMouseOut,
       removeMouseOver,
       updateHasShip() {
