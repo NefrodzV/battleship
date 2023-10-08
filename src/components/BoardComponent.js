@@ -13,9 +13,6 @@ export default function BoardComponent(object, callback) {
   orientationButton.textContent = object.Orientation.HORIZONTAL
   orientationButton.addEventListener("click", (e) => {
     e.target.textContent = object.updateShipOrientation()
-    if (!object.hasShipsAvailable()) {
-      e.target.remove()
-    }
   })
 
   if (object.hasShipsAvailable()) {
@@ -61,7 +58,7 @@ export default function BoardComponent(object, callback) {
     // If the board object returns an error result inform
     if (!result.status) {
       callback(result.type, result.msg)
-      return false
+      return 
     }
 
     result.coordinates.forEach((coordinate) => {
@@ -77,7 +74,11 @@ export default function BoardComponent(object, callback) {
       coordinatesMap.forEach(coordinate => {
         coordinate.removeMouseOut()
         coordinate.removeMouseOver()
+        coordinate.removeSetShip()
       })
+
+      // Removes the button
+      orientationButton.remove()
     }
   }
 
@@ -95,7 +96,7 @@ export default function BoardComponent(object, callback) {
     coordinateElement.classList.add(STYLE)
     
     
-    const changeColor = (clr = "aqua", saveColor) => {
+    const changeColor = (clr = "aqua") => {
       if (hasShip) {
         coordinateElement.style.backgroundColor = SHIP_CLR
         return
@@ -132,11 +133,19 @@ export default function BoardComponent(object, callback) {
       coordinateElement.removeEventListener("mouseout", mouseOutHandler)
     }
 
+    const removeSetShip = () => {
+      coordinateElement.removeEventListener("click", setShipHandler)
+    }
+
     return {
       coordinateElement,
       changeColor,
       removeMouseOut,
       removeMouseOver,
+      removeSetShip,
+      addHitListener() {
+        coordinateElement.addEventListener("click", )
+      },
       updateHasShip() {
         hasShip = true
       },

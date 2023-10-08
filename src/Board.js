@@ -2,13 +2,7 @@ import { PlayerType } from "./PlayerType"
 import Ship from "./Ship"
 
 // TODO  Remove parameters that are unneed messages and all the observers
-export default function Board(
-  player,
-  messageObserver,
-  placementObserver,
-  hitObserver,
-  sunkenObserver
-) {
+export default function Board(player) {
   const COLS = 10
   const ROWS = 10
 
@@ -27,6 +21,7 @@ export default function Board(
     ERROR: "error",
     OK: "ok",
   }
+  
   // Available ships to place length
   const availableShips = [
     { name: "Destroyer", length: 2 },
@@ -111,13 +106,13 @@ export default function Board(
   const allShipsAreSunk = () => {
     const areSunk = ships.every((ship) => ship.isSunk() === true)
 
-    if (areSunk) {
-      if (player.type === PlayerType.COMPUTER) {
-        messageObserver.notify(messages.PLAYER_WINS_MESSAGE)
-      } else {
-        messageObserver.notify(messages.COMPUTER_WINS_MESSAGE)
-      }
-    }
+    // if (areSunk) {
+    //   if (player.type === PlayerType.COMPUTER) {
+    //     messageObserver.notify(messages.PLAYER_WINS_MESSAGE)
+    //   } else {
+    //     messageObserver.notify(messages.COMPUTER_WINS_MESSAGE)
+    //   }
+    // }
   }
 
   const registerShipHit = (pointer) => {
@@ -272,6 +267,7 @@ export default function Board(
     },
 
     hasShipsAvailable() {
+      // Returns if the ships are all placed or not
       if(availableShips.length > 0) return true
       return false
     },
@@ -283,13 +279,6 @@ export default function Board(
       }
       shipOrientation = Orientation.HORIZONTAL
       return shipOrientation
-    },
-    shipHasSunk(ship) {
-      if (ship.isSunk()) {
-        return
-      }
-
-      return null
     },
   }
 }
