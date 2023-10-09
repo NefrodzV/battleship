@@ -78,6 +78,8 @@ export default function BoardComponent(object, callback) {
         coordinate.removeMouseOut()
         coordinate.removeMouseOver()
         coordinate.removeSetShip()
+        // Only add this listener if the opponent is not human aka the enemy
+        if(!object.getPlayer().isHuman())
         coordinate.addHitListener()
       })
 
