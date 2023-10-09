@@ -69,12 +69,16 @@ export default function BoardComponent(object, callback) {
       
     })
 
+    /** TODO: Remove the board from the ui and  set the listeners to be placed to register
+     * in the battleship component there is way to remove and re load the same board componenent*/ 
     // If all the ships have been placed remove the listener for placement
     if(!object.hasShipsAvailable()) {
       coordinatesMap.forEach(coordinate => {
+        // We remove the logic to place ships and add the listener to register hits
         coordinate.removeMouseOut()
         coordinate.removeMouseOver()
         coordinate.removeSetShip()
+        coordinate.addHitListener()
       })
 
       // Removes the button
@@ -83,7 +87,9 @@ export default function BoardComponent(object, callback) {
   }
 
   // Marks a hit in the board
-  const updateHit = (x, y) => {}
+  const updateHit = (x, y) => {
+    console.log("[HIT] coodinates: x:" + x + "y: " +y)
+  }
 
   // updates when a shit has been sunk
   const updateShipStatus = () => {}
@@ -117,7 +123,9 @@ export default function BoardComponent(object, callback) {
       
     }
 
-    const hitShipHandler = () => {}
+    const hitHandler = () => {
+      updateHit(x,y)
+    }
     // Event listeners only added when the player is human and ships are being placed
     if (object.hasShipsAvailable()) {
       coordinateElement.addEventListener("click", setShipHandler)
@@ -144,7 +152,7 @@ export default function BoardComponent(object, callback) {
       removeMouseOver,
       removeSetShip,
       addHitListener() {
-        coordinateElement.addEventListener("click", )
+        coordinateElement.addEventListener("click", hitHandler)
       },
       updateHasShip() {
         hasShip = true
