@@ -14,8 +14,8 @@ export default function BattleShipComponent() {
   let playerTwoBoardComponent = null
 
   
-  // Makes the selections for the mode of game
-  const createModeSelection = (game) => {
+  // Renders the elements to get the game mode
+  const makeModeSelection = (game) => {
     const modeContainer = document.createElement("div")
     modeContainer.classList.add("mode-selection")
     const title = document.createElement("h1");
@@ -27,12 +27,14 @@ export default function BattleShipComponent() {
     computerModeButton.textContent = game.GameModes.COMPUTER
     computerModeButton.type = "button"
     computerModeButton.addEventListener("click", (e) => {
+      modeContainer.remove()
       game.setGameMode(e.target.textContent)
     })
     const playerModeButton = document.createElement("button")
     playerModeButton.textContent =  game.GameModes.PLAYER
     playerModeButton.type = "button"
     playerModeButton.addEventListener("click", (e) => {
+      
       game.setGameMode(e.target.textContent)
     })
 
@@ -41,18 +43,64 @@ export default function BattleShipComponent() {
 
   }
    
+  // Renders the container to get the player name
+  const makePlayerForm = (game) => {
+      const form = document.createElement("form")
+      form.classList.add("mode-selection")
+      const formTitle = document.createElement("h1")
+      formTitle.textContent = "What is your name captain?"
+      const input = document.createElement("input")
+      input.setAttribute("required", "")
+      input.name = "name"
+      const button = document.createElement("button")
+      button.textContent = "SUBMIT"
   
+      form.addEventListener("submit", (e) => {
+        e.preventDefault()
+        const data = Object.fromEntries(new FormData(e.target))
+        const name = data.name
+        game.setPlayer(name)
+        e.target.remove()
+      })
+  
+      form.append(formTitle,input, button)
+      container.appendChild(form)
+  }
+  
+ 
+  const makePlacementCompononent = (game) => {
+    const placementContainer =  document.createElement("div")
+    placementContainer.classList.add("mode-selection")
+    const title = document.createElement("h1")
+    title.textContent = "Place your ships captain!"
+    const subtitle = document.createElement("h2")
+    const shipOrientationButton = document.createElement("button")
+    shipOrientationButton.textContent = game.changeCurrentBoardShipOrientation()
+    playerOneBoardComponent = BoardComponent(game)
+    playerOneBoardComponent.style.width  = "100%"
+    placementContainer.append(title, subtitle, shipOrientationButton, playerOneBoardComponent)
+    container.appendChild(placementContainer)
+    
+  }
   const game = Game()
 
-  const notificationHandler = (data) => {
+  const notificationHandler = (code, data) => {
     
-    switch(data) {
+    switch(code) {
       case game.Notifications.MODE_SELECTION:
-        createModeSelection(game)
+        makeModeSelection(game)
       break
 
+      case game.Notifications.MODE_GET_PLAYER_ID:
+        makePlayerForm(game)
+      break
+
+      case game.Notifications.MODE_PLACE_SHIP: 
+        makePlacementCompononent(game)
+      break
       default:
         console.log("[ERROR] Notification Handler failed")
+        console.log("[ERROR] Code: "+ code)
     }
   }
   game.Notifier.notify = notificationHandler
