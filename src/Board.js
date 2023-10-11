@@ -2,7 +2,7 @@ import { PlayerType } from "./PlayerType"
 import Ship from "./Ship"
 
 // TODO  Remove parameters that are unneed messages and all the observers
-export default function Board(player) {
+export default function Board() {
   const COLS = 10
   const ROWS = 10
 
@@ -12,11 +12,18 @@ export default function Board(player) {
     HORIZONTAL: "Horizontal",
   }
 
+
+  const ErrorCodes = {
+    INVALID_PLACEMENT: 0,
+    SHIP_ALREADY_IN_PLACE:1,
+    COORDINATE_ALREADY_FIRED:2,
+  }
+
   const Status = {
     ERROR: false,
     OK: true,
   }
-
+  
   const MessageType = {
     ERROR: "error",
     OK: "ok",
@@ -34,7 +41,6 @@ export default function Board(player) {
 
   let coordinates = []
 
-  let isDropping = player.isHuman() ? true : false
   let shipOrientation = Orientation.HORIZONTAL
 
   // By default the board will be done with Horizontal
@@ -141,6 +147,7 @@ export default function Board(player) {
     },
 
     Orientation,
+    ErrorCodes,
 
     placeShip(x, y) {
       // If the placement goes out of bounds stop and notify user
@@ -229,41 +236,40 @@ export default function Board(player) {
 
       // hitObserver.notify({ x, y })
     },
-    getPlayer() {
-      return player
-    },
-
     getOutline(x, y) {
       const MAX = 9
       const ERROR_CLR = "red"
       const OUTLINE_CLR = "black"
-
-      let currentColor = OUTLINE_CLR
+      let invalid = false
       const shipLength = availableShips.at(0).length
       const squares = []
       if (shipOrientation === Orientation.HORIZONTAL) {
         for (let i = 0; i < shipLength; i++) {
           const currentX = x + i
           if (currentX > 9) {
-            currentColor = ERROR_CLR
+            invalid = true
             break
           }
-          if (coordinates[y][currentX].ship !== null) currentColor = ERROR_CLR
+          if (coordinates[y][currentX].ship !== null) invalid = true
           squares.push({ x: currentX, y: y })
         }
       } else if (shipOrientation === Orientation.VERTICAL) {
         for (let i = 0; i < shipLength; i++) {
           const currentY = y + i
           if (currentY > MAX) {
-            currentColor = ERROR_CLR
+            invalid = true
             break
           }
-          if (coordinates[currentY][x].ship !== null) currentColor = ERROR_CLR
+          if (coordinates[currentY][x].ship !== null) invalid = true
           squares.push({ x: x, y: currentY })
         }
       }
 
-      return { coordinates: squares, clr: currentColor }
+      // If the outline has a ship in place or goes out of bounds 
+      if(invalid) {
+        return { arr: squares, errorCode: ErrorCodes.INVALID_PLACEMENT }
+      }
+      return squares
     },
 
     hasShipsAvailable() {
