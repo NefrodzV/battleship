@@ -154,7 +154,7 @@ export default function Board() {
         }
       }
 
-      return squares
+      return {arr: squares, shipId: shipPointer}
     },
 
     recieveAttack(x, y) {

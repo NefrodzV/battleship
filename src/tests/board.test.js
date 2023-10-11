@@ -86,11 +86,11 @@ test(
     gameboard.updateShipOrientation()
     // Check it return the next ship to be placed correctly
     expect(gameboard.getNextShipToPlace()).toBe("Destroyer")
-    expect(gameboard.placeShip(0, 1)).toEqual([{"x": 0, "y": 1}, {"x": 0, "y": 2}])
+    expect(gameboard.placeShip(0, 1)).toEqual({"arr": [{"x": 0, "y": 1}, {"x": 0, "y": 2}], "shipId": 0})
     expect(gameboard.getNextShipToPlace()).toBe("Submarine")
     gameboard.updateShipOrientation()
 
-    expect(gameboard.placeShip(0, 0)).toEqual([{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}])
+    expect(gameboard.placeShip(0, 0)).toEqual({"arr": [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}], "shipId": 1})
 
     // First ship position in the board
     expect(gameboard.getCoordinates()[1][0]).toEqual({
