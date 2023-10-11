@@ -1,4 +1,4 @@
-import Board from "../Board"
+import Board from "../models/Board"
 
 afterEach(() => jest.clearAllMocks())
 
@@ -82,7 +82,7 @@ test(
   "Each placement returns a array of coordinates to render in ui and makes sure they are register" +
     " in the data board as well",
   () => {
-    const gameboard = Board(player)
+    const gameboard = Board()
     // Change the ship to be place to vertical position
     gameboard.updateShipOrientation()
     expect(gameboard.placeShip(0, 1)).toEqual([{"x": 0, "y": 1}, {"x": 0, "y": 2}])
@@ -205,15 +205,6 @@ test("Place ship in gameboard when the x is 0 and horizontal", () => {
 })
 
 test("Gameboard coordinates are 10 in length", () => {
-  expect(
-    Board(
-      player
-      
-    ).getCoordinates().length
-  ).toBe(10)
-  expect(
-    Board(
-      player
-    ).getCoordinates()[0].length
-  ).toBe(10)
+  expect(Board().getCoordinates().length).toBe(10)
+  expect(Board().getCoordinates()[0].length).toBe(10)
 })
