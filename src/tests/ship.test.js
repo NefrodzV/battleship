@@ -1,4 +1,4 @@
-import Ship from "../Ship"
+import Ship from "../models/Ship"
 
 test("Ship not sunken when hits arent equal to length", () => {
   const ship = Ship("Cruiser", 3)

@@ -1,4 +1,4 @@
-import { computer } from "../computer"
+import { computer } from "../models/computer"
 
 test("Fire function must not return duplicate objects", () => {
   const values = []
