@@ -34,31 +34,18 @@ afterEach(() => jest.clearAllMocks())
 
 
 
-test("Get the outline with depending on the ship length and orientation", () => {
-  const gameboard = Board(
-    player
-  )
+test("Get the outline with depending on the ship length and orientation  and returns error codes when" +
+"the outline goes out of bounds and it renders the outline in a ships place", () => {
+  const gameboard = Board()
 
   // Returns the outline when there is no ship in place
-  expect(gameboard.getOutline(0, 0)).toEqual({
-    coordinates: [
-      {
-        x: 0,
-        y: 0,
-      },
-      {
-        x: 1,
-        y: 0,
-      },
-    ],
-    clr: "black",
-  })
+  expect(gameboard.getOutline(0, 0)).toEqual([{"x": 0, "y": 0}, {"x": 1, "y": 0}])
 
   // After placing a ship it should return error object it return the outline
   gameboard.placeShip(2,0)
   expect(gameboard.getOutline(2,0)).toEqual({
-       clr: "red",
-       coordinates: [
+       errorCode: gameboard.ErrorCodes.INVALID_PLACEMENT,
+       arr: [
           {
            "x": 2,
            "y": 0,
@@ -157,6 +144,8 @@ test("Register a miss in the board coordinate", () => {
   // })
 })
 
+
+
 test(
   "Each placement returns a array of coordinates to render in ui and makes sure they are register" +
     " in the data board as well",
@@ -211,31 +200,16 @@ test("Returns error object when ship is already in the coordinate", () => {
     player
   )
   gameboard.placeShip(0, 0)
-  expect(gameboard.placeShip(1, 0)).toEqual({
-    msg: "Ship already in place",
-    status: false,
-    type: "error",
-  }) // expect(messageObserver.notify).toBeCalled()
-  // expect(messageObserver.notify).toHaveBeenCalledWith({
-  //   type: "Error",
-  //   message: "Ship already in place!",
-  // })
+  expect(gameboard.placeShip(1, 0)).toEqual(gameboard.ErrorCodes.SHIP_ALREADY_IN_PLACE) 
+  
 })
 
 test("Returns error object when a ship will be place out of bounds", () => {
   const gameboard = Board(
     player
   )
-  expect(gameboard.placeShip(9, 0)).toEqual({
-    msg: "Invalid placement",
-    status: false,
-    type: "error",
-  })
-  // expect(messageObserver.notify).toBeCalled()
-  // expect(messageObserver.notify).toHaveBeenCalledWith({
-  //   type: "Error",
-  //   message: "Not a valid placement coordinate",
-  // })
+  expect(gameboard.placeShip(9, 0)).toEqual(gameboard.ErrorCodes.INVALID_PLACEMENT)
+  
 })
 
 test("Place a ship and checking its equal to the its length in the board", () => {
