@@ -2,8 +2,8 @@ import Board from "../models/Board"
 
 afterEach(() => jest.clearAllMocks())
 
-test("Get the outline with depending on the ship length and orientation  and returns error codes when" +
-"the outline goes out of bounds and it renders the outline in a ships place", () => {
+test("Returns the outline coordinates and notifies error if the placement will be out of bounds or "+ 
+"a ship is already in the way ", () => {
   const gameboard = Board()
 
   // Returns the outline when there is no ship in place
@@ -31,7 +31,7 @@ test("Get the outline with depending on the ship length and orientation  and ret
   
 })
 
-test("Notify the user when all ships are sunk and declare the winner", () => {
+test("Notifies when all ships in a board have sunk", () => {
   const gameboard = Board()
   gameboard.placeShip(0, 0, gameboard.Orientation.HORIZONTAL)
   gameboard.recieveAttack(0, 0)
@@ -41,19 +41,19 @@ expect(gameboard.allShipsAreSunk()).toBe(true)
 
 })
 
-test("Notify the user when a ship has sunken", () => {
+test("Notifies when a ship has sunk", () => {
   const gameboard = Board()
   gameboard.placeShip(0, 0)
   gameboard.recieveAttack(0, 0)
   expect(gameboard.recieveAttack(1, 0)).toEqual(gameboard.AttackCodes.SUNK_SHIP)
 })
-test("Observer notifies when a coordinate has already been attacked", () => {
+test("ONotifies when a coordinate has already been attacked", () => {
   const gameboard = Board()
   gameboard.recieveAttack(0, 0) // make the first attack
   expect(gameboard.recieveAttack(0, 0)).toEqual(gameboard.AttackCodes.COORDINATE_ALREADY_FIRED)
 })
 
-test("Register a ship hit and observer notifies the user a ship has been hit", () => {
+test("Notifies whe a ship is hit", () => {
   const gameboard = Board()
   gameboard.placeShip(0, 0)
   expect(gameboard.recieveAttack(0, 0)).toEqual(gameboard.AttackCodes.HIT)
@@ -79,13 +79,15 @@ test("Register a miss in the board coordinate", () => {
 
 
 test(
-  "Each placement returns a array of coordinates to render in ui and makes sure they are register" +
-    " in the data board as well",
+  "Returns the coordinates for the ship to be placed and the next ship in line to be placed",
   () => {
     const gameboard = Board()
     // Change the ship to be place to vertical position
     gameboard.updateShipOrientation()
+    // Check it return the next ship to be placed correctly
+    expect(gameboard.getNextShipToPlace()).toBe("Destroyer")
     expect(gameboard.placeShip(0, 1)).toEqual([{"x": 0, "y": 1}, {"x": 0, "y": 2}])
+    expect(gameboard.getNextShipToPlace()).toBe("Submarine")
     gameboard.updateShipOrientation()
 
     expect(gameboard.placeShip(0, 0)).toEqual([{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0}])

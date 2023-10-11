@@ -13,6 +13,7 @@ export default function Board() {
   const ErrorCodes = {
     INVALID_PLACEMENT: 0,
     SHIP_ALREADY_IN_PLACE:1,
+    ALL_SHIPS_PLACED : 2
   }
 
   // Codes for attack responses
@@ -214,6 +215,15 @@ export default function Board() {
       // Returns if the ships are all placed or not
       if(availableShips.length > 0) return true
       return false
+    },
+
+    getNextShipToPlace() {
+      if(availableShips.length === 0) {
+        return ErrorCodes.ALL_SHIPS_PLACED
+      }
+
+      const object= availableShips.at(0)
+      return object.name
     },
 
     updateShipOrientation() {
