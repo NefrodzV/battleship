@@ -1,21 +1,33 @@
 body {
   margin: 0;
   padding: 0;
-
   position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  height: 100vh;
+  
 }
 h1 {
   align-self: center;
 }
 
+.mode-selection {
+  width: 40%;
+  background-color: aliceblue;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  padding: 2rem;
+  gap: 16px;
+
+}
+
 .battleship {
+  background-color: blue;
   text-align: center;
   text-transform: uppercase;
   height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .board-container {
   display: flex;

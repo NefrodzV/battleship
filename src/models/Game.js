@@ -50,7 +50,8 @@ export default function Game() {
 
 
   //TODO: HANDLE THE LOGIC FOR PLACING SHIPS AND RENDERING THEIR OUTLINES
-  // Get the current player board
+  // Get the current player board 
+  // TODO: Make the logic to change the board when the current ship place his ships
   const getCurrentBoardToDropShips =  () => {
     if(isSinglePlayerGame) {
       return playerOne.getBoard()
@@ -86,18 +87,16 @@ export default function Game() {
 
   }
 
-  
- 
   return {
+    Notifier,
+    GameModes,
+    Notifications,
+    init,
     getCurrentBoardCoordinates,
     getCurrentBoardToDropShips,
     getCurrentBoardOutlines,
     changeCurrentBoardShipOrientation,
     setPlayer,
     setGameMode,
-    Notifier,
-    init,
-    GameModes,
-    Notifications,
   }
 }

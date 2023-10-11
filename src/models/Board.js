@@ -1,7 +1,5 @@
-import { PlayerType } from "./PlayerType"
 import Ship from "./Ship"
 
-// TODO  Remove parameters that are unneed messages and all the observers
 export default function Board() {
   const COLS = 10
   const ROWS = 10
@@ -11,13 +9,13 @@ export default function Board() {
     VERTICAL: "Vertical",
     HORIZONTAL: "Horizontal",
   }
-
-
+  // Errors codes for placement
   const ErrorCodes = {
     INVALID_PLACEMENT: 0,
     SHIP_ALREADY_IN_PLACE:1,
   }
 
+  // Codes for attack responses
   const AttackCodes = {
     COORDINATE_ALREADY_FIRED:0,
     MISSED_ATTACK:1,
@@ -110,26 +108,6 @@ export default function Board() {
     return areSunk
   }
 
-  const registerShipHit = (pointer) => {
-    const ship = ships[pointer]
-    ship.hit()
-
-    // if (ship.isSunk()) {
-    //   // If this is the computer board
-    //   if (player.type === PlayerType.COMPUTER) {
-    //     // messageObserver.notify(
-    //     //   messages.PLAYER_SUNKEN_ENEMY_SHIP_MESSAGE(ship.getName())
-    //     // )
-    //   } else {
-    //     // messageObserver.notify(
-    //     //   messages.ENEMY_SUNKEN_PLAYER_SHIP_MESSAGE(ship.getName())
-    //     // )
-    //   }
-    //   // sunkenObserver.notify(pointer)
-    //   allShipsAreSunk()
-    // }
-  }
-
   return {
     AttackCodes,
     Orientation,
@@ -185,15 +163,11 @@ export default function Board() {
         return AttackCodes.COORDINATE_ALREADY_FIRED
       }
       if (coordinate.ship === null) {
-        
         coordinate.miss = true
-        
         return AttackCodes.MISSED_ATTACK
       }
-      // Need to send updates to the ui right here when a hit occurs
+      // Set the this property to mark the hit coordinate
       coordinate.miss = false
-
-      // TODO: Implement the data to be returned to the ui when a ship is hit
       const ship = ships[coordinate.ship]
       ship.hit()
       if (ship.isSunk()) {
@@ -204,8 +178,6 @@ export default function Board() {
 
     getOutline(x, y) {
       const MAX = 9
-      const ERROR_CLR = "red"
-      const OUTLINE_CLR = "black"
       let invalid = false
       const shipLength = availableShips.at(0).length
       const squares = []
