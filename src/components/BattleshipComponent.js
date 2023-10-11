@@ -1,4 +1,4 @@
-import Game from "../Game"
+import Game from "../models/Game"
 import BoardComponent from "./BoardComponent"
 
 export default function BattleShipComponent() {
@@ -20,7 +20,6 @@ export default function BattleShipComponent() {
     modeContainer.classList.add("mode-selection")
     const title = document.createElement("h1");
     title.textContent = "Select the game mode"
-
     const subtitle = document.createElement("h2")
     subtitle.textContent = "Versus:"
     const computerModeButton = document.createElement("button")
@@ -34,7 +33,6 @@ export default function BattleShipComponent() {
     playerModeButton.textContent =  game.GameModes.PLAYER
     playerModeButton.type = "button"
     playerModeButton.addEventListener("click", (e) => {
-      
       game.setGameMode(e.target.textContent)
     })
 
@@ -74,12 +72,15 @@ export default function BattleShipComponent() {
     const title = document.createElement("h1")
     title.textContent = "Place your ships captain!"
     const subtitle = document.createElement("h2")
+    subtitle.textContent = "The next ship to place is: " + game.getCurrentBoardShipNameToPlace()
     const shipOrientationButton = document.createElement("button")
     shipOrientationButton.textContent = game.changeCurrentBoardShipOrientation()
     shipOrientationButton.onclick = (e) => {
       e.target.textContent = game.changeCurrentBoardShipOrientation()
     }
-    playerOneBoardComponent = BoardComponent(game)
+    playerOneBoardComponent = BoardComponent(game, (name) => {
+          subtitle.textContent = "The next ship to place is: " + name
+    })
     playerOneBoardComponent.style.width  = "100%"
     placementContainer.append(title, subtitle, shipOrientationButton, playerOneBoardComponent)
     container.appendChild(placementContainer)
