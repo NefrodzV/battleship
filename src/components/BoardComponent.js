@@ -1,11 +1,10 @@
-export default function BoardComponent(game) {
+export default function BoardComponent(game, callback) {
   const STYLE = "board"
 
   const board = document.createElement("div")
   board.classList.add(STYLE)
   const coordinatesMap = new Map()
 
-  
   // Handles the orientation of ships to be placed only when the player is human
   // const orientationButton = document.createElement("button")
   // orientationButton.textContent = "Horizontal"
@@ -18,23 +17,24 @@ export default function BoardComponent(game) {
   // }
 
   // Renders the outline when the board is in the placing phase
-  // function showOutline(x, y) {
-  //   const outlineObject = boardObject.getOutline(x, y)
-  //   outlineObject.coordinates.forEach((coordinate) => {
-  //     const key = `${coordinate.x}${coordinate.y}`
-  //     const element = coordinatesMap.get(key)
-  //     element.changeColor(outlineObject.clr)
-  //   })
-  // }
-  // // Removes the outline when the board is in the placing phase after mouseout event registers
-  // const removeOutline = (x, y) => {
-  //   const outlineObject = boardObject.getOutline(x, y)
-  //   outlineObject.coordinates.forEach((coordinate) => {
-  //     const key = `${coordinate.x}${coordinate.y}`
-  //     const element = coordinatesMap.get(key)
-  //     element.changeColor()
-  //   })
-  // }
+  function showOutline(x, y) {
+
+    const outlineObj = game.getCurrentBoardOutlines(x, y)
+    outlineObj.arr.forEach((coordinate) => {
+      const key = `${coordinate.x}${coordinate.y}`
+      const element = coordinatesMap.get(key)
+      element.changeColor(outlineObj.clr)
+    })
+  }
+  // Removes the outline when the board is in the placing phase after mouseout event registers
+  const removeOutline = (x, y) => {
+    const outlineObj = game.getCurrentBoardOutlines(x, y)
+    outlineObj.arr.forEach((coordinate) => {
+      const key = `${coordinate.x}${coordinate.y}`
+      const element = coordinatesMap.get(key)
+      element.changeColor()
+    })
+  }
   
   const createCoordinates = (() => {
     const coordinates = game.getCurrentBoardCoordinates()
@@ -110,14 +110,14 @@ export default function BoardComponent(game) {
   const updateShipStatus = () => {}
 
   // Class to make the coordinate element with its event handlers
-  function CoordinateComponent(x, y, hasShip = false) {
+  function CoordinateComponent(x, y, shipId = null) {
     const SHIP_CLR = "gray"
     const STYLE = "coordinate"
     const coordinateElement = document.createElement("div")
     coordinateElement.classList.add(STYLE)
     
     const changeColor = (clr = "aqua") => {
-      if (hasShip) {
+      if (shipId) {
         coordinateElement.style.backgroundColor = SHIP_CLR
         return
       }
@@ -125,11 +125,11 @@ export default function BoardComponent(game) {
     }
 
     const mouseOverHandler = () => {
-      // showOutline(x, y)
+      showOutline(x, y)
     }
 
     const mouseOutHandler = () => {
-      // removeOutline(x, y)
+      removeOutline(x, y)
     }
 
     const setShipHandler = () => {
@@ -156,19 +156,20 @@ export default function BoardComponent(game) {
 
     
     // If the coordinate has a ship already change the color this is mostly for computer render
-    if(hasShip) {
+    if(shipId) {
       changeColor(SHIP_CLR)
     }
 
-    // Event listeners only added when the player is human and ships are being placed
-    // if (object.hasShipsAvailable()) {
-    //   coordinateElement.addEventListener("click", setShipHandler)
-    //   coordinateElement.addEventListener("mouseover", mouseOverHandler)
-    //   coordinateElement.addEventListener("mouseout", mouseOutHandler)
-    // }
+    //Event listeners only added when the player is human and ships are being placed
+    if (game.getCurrentBoardHasShipsAvailable()) {
+      // coordinateElement.addEventListener("click", setShipHandler)
+      coordinateElement.addEventListener("mouseover", mouseOverHandler)
+      coordinateElement.addEventListener("mouseout", mouseOutHandler)
+    }
 
     return {
-      coordinateElement
+      coordinateElement, 
+      changeColor
     }
     // if(!object.getPlayer().isHuman()) {
     //     coordinateElement.addEventListener("click", hitHandler)
