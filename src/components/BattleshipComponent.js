@@ -1,6 +1,6 @@
 import Game from "../models/Game"
 import BoardComponent from "./BoardComponent"
-
+import { messageComponent } from "../components/MessageComponent"
 export default function BattleShipComponent() {
   const STYLE = "battleship"
   const BOARD_CONTAINER_STYLE = "board-container"
@@ -8,11 +8,19 @@ export default function BattleShipComponent() {
   container.classList.add(STYLE)
   const title = document.createElement("h1")
   title.textContent = "BATTLESHIP"
+  title.style.color = "white"
   container.appendChild(title)
+  const playerInTurnText = document.createElement("h2")
 
-  let playerOneBoardComponent = null
-  let playerTwoBoardComponent = null
+  const boardComponents = []
 
+  const Message = messageComponent
+
+  const clean = () => {
+    while(container.firstChild) {
+      container.removeChild(container.firstChild)
+    }
+  }
   
   // Renders the elements to get the game mode
   const makeModeSelection = (game) => {
@@ -61,35 +69,44 @@ export default function BattleShipComponent() {
         e.target.remove()
       })
   
-      form.append(formTitle,input, button)
+      form.append(formTitle, input, button)
       container.appendChild(form)
   }
   
  
-  const makePlacementCompononent = (game) => {
+
+  // Right now this function only updates the first player board component needs to be updated to handle two players
+  const makePlacementComponent = (game, id) => {
     const placementContainer =  document.createElement("div")
     placementContainer.classList.add("mode-selection")
-    const title = document.createElement("h1")
-    title.textContent = "Place your ships captain!"
-    const subtitle = document.createElement("h2")
-    subtitle.textContent = "The next ship to place is: " + game.getCurrentBoardShipNameToPlace()
+    placementContainer.style.height = "100%"
+    const title = document.createElement("h2")
+    title.textContent = `Place your ships captain ${id}!`
+    const subtitle = document.createElement("h3")
+    subtitle.textContent = "The next ship to place is: " + game.getNextShipName(id)
     const shipOrientationButton = document.createElement("button")
-    shipOrientationButton.textContent = game.changeCurrentBoardShipOrientation()
+    shipOrientationButton.textContent = game.changeShipOrientation(id)
     shipOrientationButton.onclick = (e) => {
-      e.target.textContent = game.changeCurrentBoardShipOrientation()
+      e.target.textContent = game.changeShipOrientation(id)
     }
-    playerOneBoardComponent = BoardComponent(game, (name) => {
-          subtitle.textContent = "The next ship to place is: " + name
+    const board = BoardComponent(id, game,(string) => {
+        subtitle.textContent = "The next ship to place is: " + string
     })
-    playerOneBoardComponent.style.width  = "100%"
-    placementContainer.append(title, subtitle, shipOrientationButton, playerOneBoardComponent)
+    board.style.width  = "100%"
+    boardComponents.push(board)
+    placementContainer.append(title, subtitle, shipOrientationButton, board)
     container.appendChild(placementContainer)
-    
+  }
+
+  const createGame = () => {
+    const boardsContainer = document.createElement("div")
+    boardsContainer.classList.add(BOARD_CONTAINER_STYLE)
+    container.appendChild(title)
+    container.appendChild(boardsContainer)
   }
   const game = Game()
 
   const notificationHandler = (code, data) => {
-    
     switch(code) {
       case game.Notifications.MODE_SELECTION:
         makeModeSelection(game)
@@ -100,7 +117,20 @@ export default function BattleShipComponent() {
       break
 
       case game.Notifications.MODE_PLACE_SHIP: 
-        makePlacementCompononent(game)
+        makePlacementComponent(game, data)
+      break
+
+      case game.Notifications.MODE_SEND_MESSAGE:
+        Message.show(data.style, data.msg)
+      break
+
+      
+      case game.Notifications.MODE_SET_COMPUTER_UI:
+
+      break
+      case game.Notifications.MODE_GAME_START: 
+      clean()
+      createGame()
       break
       default:
         console.log("[ERROR] Notification Handler failed")

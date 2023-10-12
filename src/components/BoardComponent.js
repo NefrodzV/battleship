@@ -1,25 +1,13 @@
-export default function BoardComponent(game, callback) {
+export default function BoardComponent(id, game, callback) {
   const STYLE = "board"
-
   const board = document.createElement("div")
   board.classList.add(STYLE)
   const coordinatesMap = new Map()
 
-  // Handles the orientation of ships to be placed only when the player is human
-  // const orientationButton = document.createElement("button")
-  // orientationButton.textContent = "Horizontal"
-  // orientationButton.addEventListener("click", (e) => {
-  //   e.target.textContent = boardObject.updateShipOrientation()
-  // })
-
-  // if (boardObject.hasShipsAvailable()) {
-  //   board.append(orientationButton)
-  // }
-
   // Renders the outline when the board is in the placing phase
   function showOutline(x, y) {
 
-    const outlineObj = game.getCurrentBoardOutlines(x, y)
+    const outlineObj = game.getOutlines(id, x, y)
     outlineObj.arr.forEach((coordinate) => {
       const key = `${coordinate.x}${coordinate.y}`
       const element = coordinatesMap.get(key)
@@ -28,7 +16,7 @@ export default function BoardComponent(game, callback) {
   }
   // Removes the outline when the board is in the placing phase after mouseout event registers
   const removeOutline = (x, y) => {
-    const outlineObj = game.getCurrentBoardOutlines(x, y)
+    const outlineObj = game.getOutlines(id, x, y)
     outlineObj.arr.forEach((coordinate) => {
       const key = `${coordinate.x}${coordinate.y}`
       const element = coordinatesMap.get(key)
@@ -37,12 +25,17 @@ export default function BoardComponent(game, callback) {
   }
   
   const createCoordinates = (() => {
-    const coordinates = game.getCurrentBoardCoordinates()
+    const coordinates = game.getCoordinates(id)
     console.log(coordinates[0].length)
     for (let y = coordinates.length - 1; y >= 0; y--) {
       for (let x = 0; x < coordinates[y].length; x++) {
         const ship = coordinates[y][x].ship        
         const coordinate = CoordinateComponent(x, y, ship)
+        if(game.enableSetListeners(id)) {
+          coordinate.addMouseOutListener()
+          coordinate.addMouseOverListener()
+          coordinate.addSetShipListener()
+        }
         coordinatesMap.set(`${x}${y}`, coordinate)
         board.appendChild(coordinate.coordinateElement)
       }
@@ -51,62 +44,43 @@ export default function BoardComponent(game, callback) {
 
   // Sets the ship in the board
   const setShip = (x, y) => {
-    const data = game.setShipInCurrentBoard(x,y)
+    const data = game.setShip(id, x, y)
     if(data === null || data === undefined) return
     // If the board object returns an error result inform
-    data.arr.forEach((coordinate) => {
-      const key = `${coordinate.x}${coordinate.y}`
-      const element = coordinatesMap.get(key)
-      element.setShipId(data.shipId)
-      element.changeColor()
+    data.arr.forEach((object) => {
+      const key = `${object.x}${object.y}`
+      const coordinate = coordinatesMap.get(key)
+      coordinate.setShipId(data.shipId)
+      coordinate.changeColor()
     })
 
-    if(!game.getCurrentBoardHasShipsAvailable()) {
-      coordinatesMap.forEach(coordinate => {
-        coordinate.removeMouseOut()
-        coordinate.removeMouseOver()
-        coordinate.removeSetShip()
-      })
-     
-      // TODO: REMOVE THE CURRENT BOARD ELEMENT AFTER PLACING SHIPS
-    } 
-    // Updates the subtitle
-    const nextShipInLine = game.getCurrentBoardShipNameToPlace()
+    if(!game.hasShipsAvailable(id)) {
+        coordinatesMap.forEach(coordinate => {
+          coordinate.removeMouseOutListener()
+          coordinate.removeMouseOverListener()
+          coordinate.removeSetShipListener()
+        })
+      }
+    
+    const nextShipInLine = game.getNextShipName(id)
     callback(nextShipInLine)
   }
-    
-    /** TODO: Remove the board from the ui and  set the listeners to be placed to register
-     * in the battleship component there is way to remove and re load the same board componenent*/ 
-    // If all the ships have been placed remove the listener for placement
-  //   if(!object.hasShipsAvailable()) {
-  //     coordinatesMap.forEach(coordinate => {
-  //       // We remove the logic to place ships and add the listener to register hits
-  //       coordinate.removeMouseOut()
-  //       coordinate.removeMouseOver()
-  //       coordinate.removeSetShip()
-  //       // Only add this listener if the opponent is not human aka the enemy
-  //       // if(!object.getPlayer().isHuman())
-  //       // coordinate.addHitListener()
-  //     })
-  //     
-  //     // Removes the button
-  //     orientationButton.remove()
-  //     // callback(2)
-  //   }
-  // }
+  
+  const addPlacementListeners = () => {
+    coordinatesMap.forEach((object) => {
+      object.addMouseOverListener()
+      object.addMouseOutListener()
+      object.addSetShipListener()
+    })
+  }
 
-  // if(!object.getPlayer().isHuman()) {
-  //   setShip(0,0)
-  // playerTwoBoard.placeShip(1,0)
-  // playerTwoBoard.placeShip(2,0)
-  // playerTwoBoard.placeShip(3,0)
-  // playerTwoBoard.placeShip(4,0)
-  // playerTwoBoard.placeShip(5,0)
-  // }
-  // Marks a hit in the board
-  // const updateHit = (x, y) => {
-  //   console.log("[HIT] coodinates: x:" + x + "y: " +y)
-  // }
+  const removePlacementListeners = () => {
+    coordinatesMap.forEach((object) => {
+      object.removeMouseOverListener()
+      object.removeMouseOutListener()
+      object.removeSetShipListener()
+    })
+  }
 
   // updates when a shit has been sunk
   const updateShipStatus = () => {}
@@ -147,16 +121,26 @@ export default function BoardComponent(game, callback) {
         shipId = id
     }
     
+    const addMouseOverListener = () => {
+      coordinateElement.addEventListener("mouseover", mouseOverHandler)
+    }
+    const addMouseOutListener = () => {
+      coordinateElement.addEventListener("mouseout", mouseOutHandler)
+    }
 
-    const removeMouseOver = () => {
+    const addSetShipListener = () => {
+      coordinateElement.addEventListener("click", setShipHandler)
+    }
+
+    const removeMouseOverListener = () => {
       coordinateElement.removeEventListener("mouseover", mouseOverHandler)
     }
 
-    const removeMouseOut = () => {
+    const removeMouseOutListener = () => {
       coordinateElement.removeEventListener("mouseout", mouseOutHandler)
     }
 
-    const removeSetShip = () => {
+    const removeSetShipListener = () => {
       coordinateElement.removeEventListener("click", setShipHandler)
     }
 
@@ -166,37 +150,17 @@ export default function BoardComponent(game, callback) {
       changeColor(SHIP_CLR)
     }
 
-    //Event listeners only added when the player is human and ships are being placed
-    if (game.getCurrentBoardHasShipsAvailable()) {
-      coordinateElement.addEventListener("click", setShipHandler)
-      coordinateElement.addEventListener("mouseover", mouseOverHandler)
-      coordinateElement.addEventListener("mouseout", mouseOutHandler)
-    }
-
     return {
       coordinateElement, 
       changeColor, 
       setShipId, 
-      removeMouseOut,
-      removeMouseOver,
-      removeSetShip
+      addMouseOutListener,
+      addMouseOverListener,
+      addSetShipListener,
+      removeMouseOutListener,
+      removeMouseOverListener,
+      removeSetShipListener
     }
-    // if(!object.getPlayer().isHuman()) {
-    //     coordinateElement.addEventListener("click", hitHandler)
-    // }
-    // return {
-    //   coordinateElement,
-    //   changeColor,
-    //   removeMouseOut,
-    //   removeMouseOver,
-    //   removeSetShip,
-    //   addHitListener() {
-    //     coordinateElement.addEventListener("click", hitHandler)
-    //   },
-    //   updateHasShip() {
-    //     hasShip = true
-    //   },
-    // }
   }
 
   return board
