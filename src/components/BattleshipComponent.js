@@ -73,8 +73,6 @@ export default function BattleShipComponent() {
       container.appendChild(form)
   }
   
- 
-
   // Right now this function only updates the first player board component needs to be updated to handle two players
   const makePlacementComponent = (game, id) => {
     const placementContainer =  document.createElement("div")
@@ -101,6 +99,10 @@ export default function BattleShipComponent() {
   const createGame = () => {
     const boardsContainer = document.createElement("div")
     boardsContainer.classList.add(BOARD_CONTAINER_STYLE)
+    boardComponents.forEach(board => {
+      board.style.width = ""
+      boardsContainer.appendChild(board)
+    })
     container.appendChild(title)
     container.appendChild(boardsContainer)
   }
@@ -126,11 +128,15 @@ export default function BattleShipComponent() {
 
       
       case game.Notifications.MODE_SET_COMPUTER_UI:
-
+        const board = BoardComponent(data, game)
+        boardComponents.push(board)
+        
       break
+
       case game.Notifications.MODE_GAME_START: 
       clean()
       createGame()
+      console.log(boardComponents)
       break
       default:
         console.log("[ERROR] Notification Handler failed")
