@@ -65,23 +65,6 @@ export default function BoardComponent(id, game, callback) {
     const nextShipInLine = game.getNextShipName(id)
     callback(nextShipInLine)
   }
-  
-  const addPlacementListeners = () => {
-    coordinatesMap.forEach((object) => {
-      object.addMouseOverListener()
-      object.addMouseOutListener()
-      object.addSetShipListener()
-    })
-  }
-
-  const removePlacementListeners = () => {
-    coordinatesMap.forEach((object) => {
-      object.removeMouseOverListener()
-      object.removeMouseOutListener()
-      object.removeSetShipListener()
-    })
-  }
-
   // updates when a shit has been sunk
   const updateShipStatus = () => {}
 
@@ -144,7 +127,6 @@ export default function BoardComponent(id, game, callback) {
       coordinateElement.removeEventListener("click", setShipHandler)
     }
 
-    
     // If the coordinate has a ship already change the color this is mostly for computer render
     if(shipId) {
       changeColor(SHIP_CLR)
