@@ -41,13 +41,10 @@ export default function BoardComponent(game, callback) {
     console.log(coordinates[0].length)
     for (let y = coordinates.length - 1; y >= 0; y--) {
       for (let x = 0; x < coordinates[y].length; x++) {
-        let hasShip = false
-        if(coordinates[y][x].ship !== null) {
-            hasShip = true
-        }
-          // console.log(coordinates[y][x]
+        const ship = coordinates[y][x].ship        
+        // console.log(coordinates[y][x]
         // Makes the  square elements for the coordinates  that are in the object board module
-        const coordinate = CoordinateComponent(x, y, hasShip)
+        const coordinate = CoordinateComponent(x, y, ship)
         coordinatesMap.set(`${x}${y}`, coordinate)
         board.appendChild(coordinate.coordinateElement)
       }
@@ -55,23 +52,27 @@ export default function BoardComponent(game, callback) {
   })()
 
   // Sets the ship in the board
-//   const setShip = (x, y) => {
-//     const result = object.placeShip(x, y)
-// 
-//     // If the board object returns an error result inform
-//     if (!result.status) {
-//       // callback(1,result.type, result.msg)
-//       return 
-//     }
-// 
-//     result.coordinates.forEach((coordinate) => {
-//       const key = `${coordinate.x}${coordinate.y}`
-//       const element = coordinatesMap.get(key)
-//       element.updateHasShip()
-//       element.changeColor()
-//       
-//     })
+  const setShip = (x, y) => {
+    const data = game.setShipInCurrentBoard(x,y)
+    if(data === null || data === undefined) return
+    // If the board object returns an error result inform
+    data.arr.forEach((coordinate) => {
+      const key = `${coordinate.x}${coordinate.y}`
+      const element = coordinatesMap.get(key)
+      element.setShipId(data.shipId)
+      element.changeColor()
+    })
 
+    if(!game.getCurrentBoardHasShipsAvailable()) {
+      coordinatesMap.forEach(coordinate => {
+        coordinate.removeMouseOut()
+        coordinate.removeMouseOver()
+        coordinate.removeSetShip()
+      })
+
+      // TODO: REMOVE THE CURRENT BOARD ELEMENT AFTER PLACING SHIPS
+    }
+  }
     
     /** TODO: Remove the board from the ui and  set the listeners to be placed to register
      * in the battleship component there is way to remove and re load the same board componenent*/ 
@@ -117,7 +118,7 @@ export default function BoardComponent(game, callback) {
     coordinateElement.classList.add(STYLE)
     
     const changeColor = (clr = "aqua") => {
-      if (shipId) {
+      if (typeof(shipId) === "number") {
         coordinateElement.style.backgroundColor = SHIP_CLR
         return
       }
@@ -133,26 +134,30 @@ export default function BoardComponent(game, callback) {
     }
 
     const setShipHandler = () => {
-      // setShip(x, y)
+      setShip(x, y)
       
     }
 
     const hitHandler = () => {
       // updateHit(x,y)
     }
+
+    const setShipId = (id) => {
+        shipId = id
+    }
     
 
-//     const removeMouseOver = () => {
-//       coordinateElement.removeEventListener("mouseover", mouseOverHandler)
-//     }
-// 
-//     const removeMouseOut = () => {
-//       coordinateElement.removeEventListener("mouseout", mouseOutHandler)
-//     }
-// 
-//     const removeSetShip = () => {
-//       coordinateElement.removeEventListener("click", setShipHandler)
-//     }
+    const removeMouseOver = () => {
+      coordinateElement.removeEventListener("mouseover", mouseOverHandler)
+    }
+
+    const removeMouseOut = () => {
+      coordinateElement.removeEventListener("mouseout", mouseOutHandler)
+    }
+
+    const removeSetShip = () => {
+      coordinateElement.removeEventListener("click", setShipHandler)
+    }
 
     
     // If the coordinate has a ship already change the color this is mostly for computer render
@@ -162,14 +167,18 @@ export default function BoardComponent(game, callback) {
 
     //Event listeners only added when the player is human and ships are being placed
     if (game.getCurrentBoardHasShipsAvailable()) {
-      // coordinateElement.addEventListener("click", setShipHandler)
+      coordinateElement.addEventListener("click", setShipHandler)
       coordinateElement.addEventListener("mouseover", mouseOverHandler)
       coordinateElement.addEventListener("mouseout", mouseOutHandler)
     }
 
     return {
       coordinateElement, 
-      changeColor
+      changeColor, 
+      setShipId, 
+      removeMouseOut,
+      removeMouseOver,
+      removeSetShip
     }
     // if(!object.getPlayer().isHuman()) {
     //     coordinateElement.addEventListener("click", hitHandler)

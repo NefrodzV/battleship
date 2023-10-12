@@ -6,7 +6,8 @@ export default function Game() {
   const Notifications = {
           MODE_SELECTION: 0,
           MODE_GET_PLAYER_ID:1,
-          MODE_PLACE_SHIP:2
+          MODE_PLACE_SHIP:2,
+          MODE_SEND_MESSAGE:3 
   }
 
   // Mode for versus selection
@@ -57,17 +58,20 @@ export default function Game() {
       return playerOne.getBoard()
     }
   }
-  // Get the current board to place ships coordinates
+  // Get the current board to place ships coordinates and render the squares in component
   const getCurrentBoardCoordinates = () => {
     const board = getCurrentBoardToDropShips()
     const coordinates = board.getCoordinates()
-
     return coordinates
   }
   // Gets the current player outlines for placing ships
   const getCurrentBoardOutlines = (x, y) => {
     const board = getCurrentBoardToDropShips()
-    return board
+    let data = board.getOutline(x,y)
+    if(data.errorCode === board.ErrorCodes.INVALID_PLACEMENT) {
+      return {arr: data.arr, clr: "red"}
+    }
+    return {arr: data , clr: "black"}
   }
 
   // Changes the current board ship orientation to place ships
@@ -79,9 +83,29 @@ export default function Game() {
   const setShipInCurrentBoard = (x,y) => {
     const board = getCurrentBoardToDropShips()
     // TODO  CHANGE THE IMPLEMENTATION TO NOFITY USER HERE
-    return board.placeShip(x,y)
+    const data = board.placeShip(x,y)
+   
+    if(data === board.ErrorCodes.INVALID_PLACEMENT) {
+      Notifier.notify(Notifications.MODE_SEND_MESSAGE, {style: "error" , msg: "INVALID PLACEMENT!"})
+      return
+    }
+    if(data === board.ErrorCodes.SHIP_ALREADY_IN_PLACE) {
+      Notifier.notify(Notifications.MODE_SEND_MESSAGE, {style: "error", msg:"SHIP ALREADY IN PLACED SELECT ANOTHER COORDINATE!"})
+      return
+    }
+    return data
   }
 
+  const getCurrentBoardShipNameToPlace = () => {
+    const board = getCurrentBoardToDropShips()
+    return board.getNextShipToPlace()
+  }
+
+  // Gets if the current board has ships available
+  const getCurrentBoardHasShipsAvailable = () => {
+    const board = getCurrentBoardToDropShips()
+    return board.hasShipsAvailable()
+  }
   // TODO Maybe rename and set the logic for the firing of the boards
   const fireAttackOnCurrentBoard = () => {
 
@@ -94,8 +118,11 @@ export default function Game() {
     init,
     getCurrentBoardCoordinates,
     getCurrentBoardToDropShips,
+    getCurrentBoardHasShipsAvailable,
     getCurrentBoardOutlines,
+    getCurrentBoardShipNameToPlace,
     changeCurrentBoardShipOrientation,
+    setShipInCurrentBoard,
     setPlayer,
     setGameMode,
   }
