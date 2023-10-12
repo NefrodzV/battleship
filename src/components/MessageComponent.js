@@ -11,6 +11,7 @@ const messageComponent = (function Message() {
 
         setTimeout(() => {
           message.toggleAttribute("show")
+          message.textContent = ""
         }, 2000)
       },
     }
