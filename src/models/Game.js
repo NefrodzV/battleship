@@ -63,10 +63,8 @@ export default function Game() {
     if(isSinglePlayerGame) {
       playerOne = Player(name, true)
       playerTwo = Player("AI", false)
-      // We notify the ui to make the board for the computer and for 
-      //render the mode for placement in the second
-      // playerInAction = playerOne
-      Notifier.notify(Notifications.MODE_SET_COMPUTER_UI, playerTwo.getBoard())
+      
+      // Notifier.notify(Notifications.MODE_SET_COMPUTER_UI, playerTwo.name)
       Notifier.notify(Notifications.MODE_PLACE_SHIP, playerOne.name)
       return;
     }
@@ -153,12 +151,6 @@ export default function Game() {
     getNextShipName,
     hasShipsAvailable,
     enableSetListeners,
-    // getCurrentBoardCoordinates,
-    // getCurrentBoardToDropShips,
-    // getCurrentBoardOutlines,
-    // getCurrentBoardShipNameToPlace,
-    // changeCurrentBoardShipOrientation,
-    // setShipInCurrentBoard,
     setPlayer,
     setGameMode,
   }
