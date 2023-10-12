@@ -42,8 +42,6 @@ export default function BoardComponent(game, callback) {
     for (let y = coordinates.length - 1; y >= 0; y--) {
       for (let x = 0; x < coordinates[y].length; x++) {
         const ship = coordinates[y][x].ship        
-        // console.log(coordinates[y][x]
-        // Makes the  square elements for the coordinates  that are in the object board module
         const coordinate = CoordinateComponent(x, y, ship)
         coordinatesMap.set(`${x}${y}`, coordinate)
         board.appendChild(coordinate.coordinateElement)
@@ -69,9 +67,12 @@ export default function BoardComponent(game, callback) {
         coordinate.removeMouseOver()
         coordinate.removeSetShip()
       })
-
+     
       // TODO: REMOVE THE CURRENT BOARD ELEMENT AFTER PLACING SHIPS
-    }
+    } 
+    // Updates the subtitle
+    const nextShipInLine = game.getCurrentBoardShipNameToPlace()
+    callback(nextShipInLine)
   }
     
     /** TODO: Remove the board from the ui and  set the listeners to be placed to register
