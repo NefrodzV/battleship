@@ -1,4 +1,3 @@
-import { PlayerType } from "./PlayerType"
 import { computer } from "./computer"
 import Board from "./Board"
 export default function Player(name, isHuman) {
