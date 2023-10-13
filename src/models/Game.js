@@ -13,9 +13,15 @@ export default function Game() {
           MODE_ADD_PLACEMENT_LOGIC:6,
           MODE_REMOVE_PLACEMENT_LOGIC:7,
           MODE_ADD_HIT_LISTENER:8,
-          MODE_REMOVE_HIT_LISTENER:9
+          MODE_REMOVE_HIT_LISTENER:9,
+          MODE_UPDATE_TURN: 10,
+          MODE_DECLARE_WINNER: 11,
+          MODE_COMPUTER_ATTACK:12
   }
 
+  // const ComputerNotifier = {
+  //   notify: null
+  // }
   // Mode for versus selection
   const GameModes = {
       PLAYER: "Player",
@@ -25,6 +31,7 @@ export default function Game() {
   let playerOne = null
   let playerTwo = null
 
+  let turn = 0
   let isSinglePlayerGame = null
   const Notifier = {
     // Function to notify the ui
@@ -55,8 +62,10 @@ export default function Game() {
       //   }
       // }
       // Starts the game
-      Notifier.notify(Notifications.MODE_SET_COMPUTER_UI)
-      Notifier.notify(Notifications.MODE_GAME_START)
+      Notifier.notify(Notifications.MODE_SET_COMPUTER_UI, playerTwo.name)
+      Notifier.notify(Notifications.MODE_GAME_START, 
+        {playerOneName: playerOne.name, playerTwoName: playerTwo.name}
+      )
   }
   
   const setPlayer = (name) => {
@@ -133,10 +142,57 @@ export default function Game() {
     return board.hasShipsAvailable()
   }
 
-  
-  // TODO Maybe rename and set the logic for the firing of the boards
-  const fireAttackOnCurrentBoard = () => {
+  // Game loop logic
+  // Functions enable the click listeners for firing when needed
+  const enableFireListener = (id) => {
+    if(isSinglePlayerGame) {
+      if(id === playerTwo.name) {
+        return true
+      }
+    }
+    return false
+  }
 
+  const executeAIAttack = () => {
+    const computerAttack = playerTwo.computer.fire()
+    console.log(computerAttack)
+    
+    Notifier.notify(Notifications.MODE_COMPUTER_ATTACK, computerAttack)
+  }
+
+  const updateCurrentTurn = () => {
+
+  }
+  // Logic to handle the fire logic when the game starts
+  const fireBoard = (id, x, y) => {
+    if(isSinglePlayerGame) {
+      const board = identifyBoard(id)
+      const data = board.recieveAttack(x,y)
+
+      if(id === playerTwo.name) { executeAIAttack() }
+      if(data === board.AttackCodes.COORDINATE_ALREADY_FIRED) {
+        Notifier.notify(Notifications.MODE_SEND_MESSAGE, {style: "error", msg: "Coodinate already fired!"})
+        return
+      }
+
+      // If the attack missed return the color orange
+      if(data === board.AttackCodes.MISSED_ATTACK) {
+        return "orange"
+      }
+
+      //If the attack was successful return the color red
+      if(data === board.AttackCodes.HIT) {
+        return "red"
+      }
+
+      if(data === board.AttackCodes.SUNK_SHIP) {
+        console.log(data)
+        console.log("ship has sunk")
+        return "sunk"
+      }
+
+      // Need to make the case of sunk ship
+    }
   }
 
   return {
@@ -153,5 +209,7 @@ export default function Game() {
     enableSetListeners,
     setPlayer,
     setGameMode,
+    enableFireListener,
+    fireBoard
   }
 }

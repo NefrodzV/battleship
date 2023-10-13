@@ -36,6 +36,11 @@ export default function BoardComponent(id, game, callback) {
           coordinate.addMouseOverListener()
           coordinate.addSetShipListener()
         }
+// console.log(game.enableFireListener(id))
+        if(game.enableFireListener(id)) {
+          
+          coordinate.addFireListener()
+        }
         coordinatesMap.set(`${x}${y}`, coordinate)
         board.appendChild(coordinate.coordinateElement)
       }
@@ -66,16 +71,39 @@ export default function BoardComponent(id, game, callback) {
     callback(nextShipInLine)
   }
   // updates when a shit has been sunk
-  const updateShipStatus = () => {}
+  const renderShipSunk = (pointer) => {
+    
+      coordinatesMap.forEach(coordinate => {
+        if(coordinate.getId() === pointer) {
+          console.log("found ship sunked")
+          coordinate.coordinateElement.style.backgroundColor= ""
+          coordinate.coordinateElement.classList.add("sunk")
+        }
+      })
+  }
 
+  const handleComputerAttack = (x,y) => {
+    coordinatesMap.forEach(coordinate => {
+
+    })
+  }
+
+  const computerMove = (x,y) => {
+
+  }
   // Class to make the coordinate element with its event handlers
   function CoordinateComponent(x, y, shipId = null) {
     const SHIP_CLR = "gray"
     const STYLE = "coordinate"
     const coordinateElement = document.createElement("div")
     coordinateElement.classList.add(STYLE)
-    
+    let hit = false;
+
     const changeColor = (clr = "aqua") => {
+      if(hit) {
+        coordinateElement.style.backgroundColor = clr
+        return
+      }
       if (typeof(shipId) === "number") {
         coordinateElement.style.backgroundColor = SHIP_CLR
         return
@@ -92,17 +120,61 @@ export default function BoardComponent(id, game, callback) {
     }
 
     const setShipHandler = () => {
+      console.log(id)
       setShip(x, y)
-      
     }
 
     const hitHandler = () => {
-      // updateHit(x,y)
+      const data = game.fireBoard(id, x,y)
+      if(data === "orange") {
+        changeColor(data)
+      }
+
+      if(data === "red") {
+        hit = true
+        changeColor(data)
+      }
+
+      if(data === "sunk") {
+        console.log("ship sunk coordinate")
+        renderShipSunk(shipId)
+      }
+    }
+
+    // This will run whe the computer fires the op
+//     game.ComputerNotifier.notify = (name, xCoordinate, yCoordinate) => {
+//       
+//       if(name === id) {
+//         console.log("running computer notify")
+//         const data = game.fireBoard(id, xCoordinate, yCoordinate)
+//         if(data === "orange") {
+//         changeColor(data)
+//          }
+// 
+//         if(data === "red") {
+//           hit = true
+//           changeColor(data)
+//         }
+// 
+//         if(data === "sunk") {
+//           console.log("ship sunk coordinate")
+//           renderShipSunk(shipId)
+//         }
+//       }
+//       
+//       
+//       
+//     }
+
+    const renderComputerMove = (type, x,y) => {
+      
     }
 
     const setShipId = (id) => {
         shipId = id
     }
+    // Enforce the ship color in some cases
+    changeColor()
     
     const addMouseOverListener = () => {
       coordinateElement.addEventListener("mouseover", mouseOverHandler)
@@ -127,23 +199,34 @@ export default function BoardComponent(id, game, callback) {
       coordinateElement.removeEventListener("click", setShipHandler)
     }
 
+    const addFireListener = ()=> {
+      coordinateElement.addEventListener("click", hitHandler)
+    }
+
     // If the coordinate has a ship already change the color this is mostly for computer render
     if(shipId) {
       changeColor(SHIP_CLR)
     }
 
+    const getId = () => {
+      return shipId
+    }
     return {
       coordinateElement, 
+      getId,
       changeColor, 
       setShipId, 
       addMouseOutListener,
       addMouseOverListener,
       addSetShipListener,
+      addFireListener,
       removeMouseOutListener,
       removeMouseOverListener,
-      removeSetShipListener
+      removeSetShipListener,
     }
   }
 
-  return board
+  return {
+    board
+  }
 }

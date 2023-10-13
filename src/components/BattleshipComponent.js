@@ -8,7 +8,6 @@ export default function BattleShipComponent() {
   container.classList.add(STYLE)
   const title = document.createElement("h1")
   title.textContent = "BATTLESHIP"
-  title.style.color = "white"
   container.appendChild(title)
   const playerInTurnText = document.createElement("h2")
 
@@ -87,21 +86,26 @@ export default function BattleShipComponent() {
     shipOrientationButton.onclick = (e) => {
       e.target.textContent = game.changeShipOrientation(id)
     }
-    const board = BoardComponent(id, game,(string) => {
+    const object = BoardComponent(id, game,(string) => {
         subtitle.textContent = "The next ship to place is: " + string
     })
-    board.style.width  = "100%"
-    boardComponents.push(board)
-    placementContainer.append(title, subtitle, shipOrientationButton, board)
+    object.board.style.width  = "100%"
+    boardComponents.push(object)
+    placementContainer.append(title, subtitle, shipOrientationButton, object.board)
     container.appendChild(placementContainer)
   }
 
-  const createGame = () => {
+  const createGame = (data) => {
     const boardsContainer = document.createElement("div")
     boardsContainer.classList.add(BOARD_CONTAINER_STYLE)
-    boardComponents.forEach(board => {
-      board.style.width = ""
-      boardsContainer.appendChild(board)
+    const firstPlayerName = document.createElement("h2")
+    firstPlayerName.textContent = data.playerOneName
+    const secondPlayerName = document.createElement("h2")
+    secondPlayerName.textContent = data.playerTwoName
+    boardsContainer.append(firstPlayerName, secondPlayerName)
+    boardComponents.forEach((object, i) => {
+      object.board.style.width = ""
+      boardsContainer.appendChild(object.board)
     })
     container.appendChild(title)
     container.appendChild(boardsContainer)
@@ -126,8 +130,8 @@ export default function BattleShipComponent() {
         Message.show(data.style, data.msg)
       break
 
-      
       case game.Notifications.MODE_SET_COMPUTER_UI:
+        console.log(data)
         const board = BoardComponent(data, game)
         boardComponents.push(board)
         
@@ -135,8 +139,7 @@ export default function BattleShipComponent() {
 
       case game.Notifications.MODE_GAME_START: 
       clean()
-      createGame()
-      console.log(boardComponents)
+      createGame(data)
       break
       default:
         console.log("[ERROR] Notification Handler failed")
