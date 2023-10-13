@@ -1,4 +1,5 @@
 body {
+  background-color: aliceblue;
   margin: 0;
   padding: 0;
   position: relative;
@@ -25,7 +26,6 @@ h1 {
 }
 
 .battleship {
-  background-color: blue;
   text-align: center;
   text-transform: uppercase;
   height: 100%;
@@ -35,7 +35,9 @@ h1 {
 }
 
 .board-container {
-  display: flex;
+  display: grid;
+  grid-template-rows:  100px auto;
+  grid-template-columns: 50% 50%;
   gap: 1rem;
   margin: 2%;
   width: 95%;
@@ -47,13 +49,15 @@ h1 {
 }
 
 .board {
+  border: 3px solid black;
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
   height: 600px;
   width: 600px;
-  background-color: blue;
-  gap: 1px;
+  
+  
+  justify-self: center;
 }
 
 .board > button {
@@ -65,12 +69,18 @@ h1 {
 }
 
 .coordinate {
+  border: .5px solid black;
   /* z-index: 100; */
   position: relative;
   width: 100%;
   height: 100%;
   background-color: aqua;
 }
+
+/* .coordinate:hover {
+  transform: scale(.8);
+  z-index: 1;
+} */
 
 .player-form {
   box-shadow: 0px 3px 3px black;
@@ -127,4 +137,13 @@ button {
   justify-self: center;
   color: red;
   box-shadow: 0px 3px 6px red;
+}
+
+.sunk {
+  /* border:  1px solid white ; */
+  align-self: center;
+  /* width: 50px;
+  height: 50px; */
+  justify-self: center;
+  background-color: red;
 }
