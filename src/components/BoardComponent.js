@@ -88,7 +88,15 @@ export default function BoardComponent(id, game, callback) {
     })
   }
 
-  const computerMove = (x,y) => {
+  const computerMove = (data, x, y) => {
+    const coordinate = coordinatesMap.get(`${x}${y}`)
+    if(coordinate === null) {
+      console.log("[Error] Board throwing null" + id)
+      return
+    }
+
+    coordinate.renderComputerMove(data)
+    
 
   }
   // Class to make the coordinate element with its event handlers
@@ -100,6 +108,10 @@ export default function BoardComponent(id, game, callback) {
     let hit = false;
 
     const changeColor = (clr = "aqua") => {
+      if(game.enableShipsVisibility(id) && !hit) {
+        coordinateElement.style.backgroundColor = clr
+        return
+      }
       if(hit) {
         coordinateElement.style.backgroundColor = clr
         return
@@ -125,7 +137,7 @@ export default function BoardComponent(id, game, callback) {
     }
 
     const hitHandler = () => {
-      const data = game.fireBoard(id, x,y)
+      const data = game.fireBoard(id, x, y)
       if(data === "orange") {
         changeColor(data)
       }
@@ -166,9 +178,7 @@ export default function BoardComponent(id, game, callback) {
 //       
 //     }
 
-    const renderComputerMove = (type, x,y) => {
-      
-    }
+    
 
     const setShipId = (id) => {
         shipId = id
@@ -204,12 +214,29 @@ export default function BoardComponent(id, game, callback) {
     }
 
     // If the coordinate has a ship already change the color this is mostly for computer render
-    if(shipId) {
-      changeColor(SHIP_CLR)
-    }
+    // if(shipId) {
+    //   changeColor(SHIP_CLR)
+    // }
 
     const getId = () => {
       return shipId
+    }
+
+    // Sometimes the data is a color and for sunk its a class
+    const renderComputerMove = (data) => {
+      if(data === "orange") {
+        changeColor(data)
+      }
+
+      if(data === "red") {
+        hit = true
+        changeColor(data)
+      }
+
+      if(data === "sunk") {
+        console.log("ship sunk coordinate")
+        renderShipSunk(shipId)
+      }
     }
     return {
       coordinateElement, 
@@ -223,10 +250,12 @@ export default function BoardComponent(id, game, callback) {
       removeMouseOutListener,
       removeMouseOverListener,
       removeSetShipListener,
+      renderComputerMove,
     }
   }
 
   return {
-    board
+    board,
+    computerMove
   }
 }

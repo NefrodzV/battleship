@@ -141,6 +141,15 @@ export default function BattleShipComponent() {
       clean()
       createGame(data)
       break
+
+      
+      case game.Notifications.MODE_COMPUTER_ATTACK:
+        const clr = data.clr
+        const xCoordinate = data.computerAttack.x
+        const yCoordinate = data.computerAttack.y
+        const humanPlayerBoard = boardComponents[0]
+        humanPlayerBoard.computerMove(clr, xCoordinate, yCoordinate)
+      break
       default:
         console.log("[ERROR] Notification Handler failed")
         console.log("[ERROR] Code: "+ code)

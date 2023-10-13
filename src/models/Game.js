@@ -156,8 +156,26 @@ export default function Game() {
   const executeAIAttack = () => {
     const computerAttack = playerTwo.computer.fire()
     console.log(computerAttack)
-    
-    Notifier.notify(Notifications.MODE_COMPUTER_ATTACK, computerAttack)
+    const board = playerOne.getBoard()
+    const data = board.recieveAttack(computerAttack.x, computerAttack.y)
+    if(data === board.AttackCodes.COORDINATE_ALREADY_FIRED) {
+      Notifier.notify(Notifications.MODE_SEND_MESSAGE, {style: "error", msg: "Coodinate already fired!"})
+      return
+    }
+
+    // If the attack missed return the color orange
+    if(data === board.AttackCodes.MISSED_ATTACK) {
+      Notifier.notify(Notifications.MODE_COMPUTER_ATTACK, {clr: "orange", computerAttack})
+    }
+
+    //If the attack was successful return the color red
+    if(data === board.AttackCodes.HIT) {
+      Notifier.notify(Notifications.MODE_COMPUTER_ATTACK, {clr: "red", computerAttack})
+    }
+
+    if(data === board.AttackCodes.SUNK_SHIP) {
+      Notifier.notify(Notifications.MODE_COMPUTER_ATTACK, {clr: "sunk", computerAttack})
+    }
   }
 
   const updateCurrentTurn = () => {
@@ -169,12 +187,12 @@ export default function Game() {
       const board = identifyBoard(id)
       const data = board.recieveAttack(x,y)
 
-      if(id === playerTwo.name) { executeAIAttack() }
+      
       if(data === board.AttackCodes.COORDINATE_ALREADY_FIRED) {
         Notifier.notify(Notifications.MODE_SEND_MESSAGE, {style: "error", msg: "Coodinate already fired!"})
         return
       }
-
+      if(id === playerTwo.name) { executeAIAttack() }
       // If the attack missed return the color orange
       if(data === board.AttackCodes.MISSED_ATTACK) {
         return "orange"
@@ -195,6 +213,13 @@ export default function Game() {
     }
   }
 
+  const enableShipsVisibility = (id) => {
+    if(id === playerTwo.name) {
+      return true
+    }
+    return false
+  }
+
   return {
     Notifier,
     GameModes,
@@ -210,6 +235,7 @@ export default function Game() {
     setPlayer,
     setGameMode,
     enableFireListener,
-    fireBoard
+    fireBoard,
+    enableShipsVisibility
   }
 }
