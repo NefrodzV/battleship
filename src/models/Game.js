@@ -19,10 +19,6 @@ export default function Game() {
           MODE_COMPUTER_ATTACK:12
   }
 
-  // const ComputerNotifier = {
-  //   notify: null
-  // }
-  // Mode for versus selection
   const GameModes = {
       PLAYER: "Player",
       COMPUTER: "Computer"
@@ -31,7 +27,6 @@ export default function Game() {
   let playerOne = null
   let playerTwo = null
 
-  let turn = 0
   let isSinglePlayerGame = null
   const Notifier = {
     // Function to notify the ui
@@ -155,7 +150,6 @@ export default function Game() {
 
   const executeAIAttack = () => {
     const computerAttack = playerTwo.computer.fire()
-    console.log(computerAttack)
     const board = playerOne.getBoard()
     const data = board.recieveAttack(computerAttack.x, computerAttack.y)
     if(data === board.AttackCodes.COORDINATE_ALREADY_FIRED) {
@@ -175,12 +169,12 @@ export default function Game() {
 
     if(data === board.AttackCodes.SUNK_SHIP) {
       Notifier.notify(Notifications.MODE_COMPUTER_ATTACK, {clr: "sunk", computerAttack})
+      if(board.allShipsAreSunk()) {
+        Notifier.notify(Notifications.MODE_DECLARE_WINNER, "We've lost captain...")
+      }
     }
   }
 
-  const updateCurrentTurn = () => {
-
-  }
   // Logic to handle the fire logic when the game starts
   const fireBoard = (id, x, y) => {
     if(isSinglePlayerGame) {
@@ -204,8 +198,9 @@ export default function Game() {
       }
 
       if(data === board.AttackCodes.SUNK_SHIP) {
-        console.log(data)
-        console.log("ship has sunk")
+        if(board.allShipsAreSunk()) {
+          Notifier.notify(Notifications.MODE_DECLARE_WINNER, "We win captain!")
+        }
         return "sunk"
       }
 
