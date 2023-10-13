@@ -78,14 +78,9 @@ export default function BoardComponent(id, game, callback) {
           console.log("found ship sunked")
           coordinate.coordinateElement.style.backgroundColor= ""
           coordinate.coordinateElement.classList.add("sunk")
+          coordinate.coordinateElement.textContent = "X"
         }
       })
-  }
-
-  const handleComputerAttack = (x,y) => {
-    coordinatesMap.forEach(coordinate => {
-
-    })
   }
 
   const computerMove = (data, x, y) => {
