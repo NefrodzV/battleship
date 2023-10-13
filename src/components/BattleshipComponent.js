@@ -9,7 +9,7 @@ export default function BattleShipComponent() {
   const title = document.createElement("h1")
   title.textContent = "BATTLESHIP"
   container.appendChild(title)
-  const playerInTurnText = document.createElement("h2")
+  
 
   const boardComponents = []
 
@@ -110,6 +110,13 @@ export default function BattleShipComponent() {
     container.appendChild(title)
     container.appendChild(boardsContainer)
   }
+
+  const declareWinner = (data) => {
+    const winnerDiv = document.createElement("div")
+    winnerDiv.className = "winner"
+    winnerDiv.textContent = data
+    document.body.appendChild(winnerDiv)
+  }
   const game = Game()
 
   const notificationHandler = (code, data) => {
@@ -149,6 +156,10 @@ export default function BattleShipComponent() {
         const yCoordinate = data.computerAttack.y
         const humanPlayerBoard = boardComponents[0]
         humanPlayerBoard.computerMove(clr, xCoordinate, yCoordinate)
+      break
+
+      case game.Notifications.MODE_DECLARE_WINNER:
+        declareWinner(data)
       break
       default:
         console.log("[ERROR] Notification Handler failed")
